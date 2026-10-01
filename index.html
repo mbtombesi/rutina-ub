@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Rutina Unión Bahía</title>
+<meta name="theme-color" content="#0E1B2C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Rutina UB">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Public+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: una columna tipo planilla de gimnasio; cabecera fija con semana + día, bloques C1–C4 como en la hoja del club */
+:root{
+  --paper:#ECEFF2; --card:#FFFFFF; --ink:#0E1B2C; --muted:#5A6878; --line:#D3DAE1;
+  --accent:#00808F; --accent-soft:#D6F0F2; --hot:#C9461A; --hot-soft:#FBE3D8; --ok:#2C7A3F;
+  --display:"Big Shoulders Display","Arial Narrow","Roboto Condensed",sans-serif;
+  --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0A131E; --card:#111D2B; --ink:#E5ECF2; --muted:#8C9DAF; --line:#22334A;
+  --accent:#2CC6D6; --accent-soft:#0F3540; --hot:#FF8350; --hot-soft:#3A1E14; --ok:#5CC57A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0A131E; --card:#111D2B; --ink:#E5ECF2; --muted:#8C9DAF; --line:#22334A;
+  --accent:#2CC6D6; --accent-soft:#0F3540; --hot:#FF8350; --hot-soft:#3A1E14; --ok:#5CC57A; color-scheme:dark}
+
+*{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+[hidden]{display:none!important}
+body{margin:0;-webkit-text-size-adjust:100%;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.4;font-variant-numeric:tabular-nums}
+.wrap{max-width:680px;margin:0 auto;padding-inline:16px;padding-block:0 48px}
+
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);padding-block:14px 10px;border-bottom:2px solid var(--ink)}
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+h1{font-family:var(--display);font-weight:900;font-size:34px;line-height:.95;margin:2px 0 0;letter-spacing:.01em;text-transform:uppercase;text-wrap:balance}
+.rmbtn{font:700 13px var(--body);letter-spacing:.06em;text-transform:uppercase;background:var(--ink);color:var(--paper);border:0;border-radius:6px;padding:9px 12px;cursor:pointer;flex:none}
+.rmbtn[aria-expanded="true"]{background:var(--accent);color:var(--card)}
+
+.weeks{display:flex;gap:6px;margin-top:12px}
+.weeks button{flex:1;font:800 20px var(--display);text-transform:uppercase;letter-spacing:.03em;padding:6px 0;border:2px solid var(--ink);background:transparent;color:var(--ink);border-radius:6px;cursor:pointer}
+.weeks button small{display:block;font:600 10px var(--body);letter-spacing:.08em;color:var(--muted)}
+.weeks button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.weeks button[aria-pressed="true"] small{color:var(--paper);opacity:.75}
+
+.days{display:flex;gap:4px;margin-top:8px;overflow-x:auto;scrollbar-width:none}
+.days::-webkit-scrollbar{display:none}
+.days button{flex:1 0 auto;font:700 13px var(--body);letter-spacing:.06em;text-transform:uppercase;padding:8px 10px;border:0;border-bottom:3px solid transparent;background:transparent;color:var(--muted);cursor:pointer}
+.days button[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.status{font-size:12px;color:var(--muted);margin:10px 0 0;display:flex;align-items:center;gap:6px}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--muted);display:inline-block}
+.status.ok i{background:var(--ok)}
+.status.warn i{background:var(--hot)}
+
+/* Ajustes */
+#ajustes{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px;margin-top:14px}
+#ajustes h2{font:800 20px var(--display);text-transform:uppercase;margin:0 0 4px}
+#ajustes p{margin:0 0 12px;color:var(--muted);font-size:13px}
+.rmgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.rmgrid label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--muted)}
+
+/* Bloques */
+.block{margin-top:22px}
+.bhead{display:flex;align-items:baseline;gap:10px;border-bottom:1px solid var(--line);padding-bottom:4px}
+.bhead h3{font:900 24px var(--display);margin:0;text-transform:uppercase;letter-spacing:.02em}
+.bhead span{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.ex{display:grid;grid-template-columns:minmax(0,1fr) 108px;gap:6px 12px;align-items:center;padding:12px 0;border-bottom:1px dashed var(--line)}
+.ex:last-child{border-bottom:0}
+.name{font-weight:700;font-size:15px}
+.name em{font-style:normal;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-left:6px}
+.rx{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:4px;font-size:13px;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:2px 8px;border-radius:4px;white-space:nowrap}
+.chip.rm{background:var(--hot-soft);color:var(--hot)}
+.chip.rm b{font-size:14px}
+.chip.pc{background:var(--accent-soft);color:var(--accent)}
+.chip.miss{background:transparent;border:1px dashed var(--muted);color:var(--muted);cursor:pointer;font:inherit;font-size:12px;font-weight:600}
+.ref{font-size:12px;color:var(--muted);margin-top:4px}
+.ref b{color:var(--ink)}
+.field{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:6px;background:var(--card);overflow:hidden}
+.field:focus-within{border-color:var(--accent)}
+.field input{width:100%;min-width:0;border:0;background:transparent;color:var(--ink);font:700 17px var(--body);padding:9px 4px 9px 10px;text-align:right;font-variant-numeric:tabular-nums}
+.field input:focus{outline:none}
+.field span{font-size:11px;font-weight:700;color:var(--muted);padding-right:9px;text-transform:uppercase}
+.field.filled{border-color:var(--accent);background:var(--accent-soft)}
+.none{font-size:12px;color:var(--muted);text-align:right}
+.foot{margin-top:28px;font-size:12px;color:var(--muted)}
+.backup{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.backup h4{margin:0 0 4px;font:800 16px var(--display);text-transform:uppercase}
+.backup .btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.btn2{font:700 13px var(--body);padding:9px 12px;border-radius:6px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer}
+@media (max-width:520px){h1{font-size:24px}.eyebrow{font-size:10px}header{padding-block:10px 6px}.weeks{margin-top:8px}.weeks button{font-size:16px;padding:4px 0}.weeks button small{font-size:9px}.days button{padding:6px 9px;font-size:12px}.rmbtn{padding:7px 10px;font-size:12px}}
+@media (max-width:380px){.ex{grid-template-columns:minmax(0,1fr) 92px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="top">
+      <div>
+        <div class="eyebrow">Unión Bahía · Tombesi</div>
+        <h1>Rutina de fuerza</h1>
+      </div>
+      <button class="rmbtn" id="rmbtn" aria-expanded="false" aria-controls="ajustes">Mis RM</button>
+    </div>
+    <div class="weeks" id="weeks"></div>
+    <nav class="days" id="days"></nav>
+  </header>
+
+  <section id="ajustes" hidden>
+    <h2>Mis RM y peso corporal</h2>
+    <p>Los RM vienen de la tabla del club. Si te toman un test nuevo, cambialo acá y los porcentajes se recalculan solos. El peso corporal sirve para los ejercicios con % PC.</p>
+    <div class="rmgrid" id="rmgrid"></div>
+    <div class="backup">
+      <h4>Copia de seguridad</h4>
+      <p>Tus registros quedan guardados en este celu. Bajá una copia cada tanto, o para pasarlos a otro dispositivo.</p>
+      <div class="btns">
+        <button type="button" class="btn2" id="exportar">Descargar copia</button>
+        <button type="button" class="btn2" id="importar">Restaurar copia</button>
+        <input type="file" id="archivo" accept="application/json,.json" hidden>
+      </div>
+      <p id="bkmsg" style="margin:8px 0 0"></p>
+    </div>
+  </section>
+
+  <div class="status" id="status"><i></i><span>Conectando…</span></div>
+  <main id="main"></main>
+  <p class="foot">Los pesos son opcionales: cargá solo lo que quieras. Se guarda en el celu al salir del casillero. Cargas por % redondeadas al kg, igual que la tabla del club.</p>
+</div>
+
+<script>
+const BLOCK_ID = "b1"; // Planificación semanas 1–3
+const RMS = [
+  {k:"press",      n:"Press de hombros", def:41},
+  {k:"remo",       n:"Remo (prono / c/barra)", def:57},
+  {k:"cadera",     n:"Elevación de cadera", def:160},
+  {k:"sentadilla", n:"Sentadilla", def:null},
+  {k:"envion",     n:"Envión – 2do tiempo", def:null},
+];
+const s3 = r => ["3 × "+r,"4 × "+r,"5 × "+r];
+const PCT = [70,75,80];
+const PX  = ["3 × 5","3 × 3","3 × 1"];
+
+const DAYS = [
+ {k:"lun", t:"Lun", blocks:[
+  {b:"Activación", ex:[{id:"landmine", n:"2dos tiempos landmine", rx:"3 × 4/4", log:"kg"}]},
+  {b:"Envión", ex:[{id:"2t", n:"2do tiempo", rx:PX, pct:PCT, rm:"envion", log:"kg"}]},
+  {b:"C1", ex:[
+    {id:"sentadilla", n:"Sentadilla", rx:PX, pct:PCT, rm:"sentadilla", log:"kg"},
+    {id:"press", n:"Press de hombros", rx:PX, pct:PCT, rm:"press", log:"kg"}]},
+  {b:"C2", sub:"Contraste", ex:[
+    {id:"saltoscarga", n:"Saltos con carga", rx:["3 × 2","3 × 3","3 × 4"], pc:30, log:"kg"},
+    {id:"abk", n:"Máx / ABK al cajón", rx:"3 × 3"},
+    {id:"vallas", n:"Salto a vallas", rx:"3 × 3"}]},
+  {b:"C3", ex:[
+    {id:"nordico", n:"Curl nórdico", rx:["3 × 3","3 × 4","3 × 5"]},
+    {id:"remo3", n:"Remo 3 apoyos", rx:["3 × 12-12-10 · RIR 2","3 × 10-10-10 · RIR 2","3 × 10-10-8 · RIR 2"], log:"kg"}]},
+  {b:"C4", ex:[
+    {id:"menton", n:"Remo al mentón", rx:"3-6 × 10", log:"kg"},
+    {id:"triceps", n:"Tríceps", rx:"3-6 × 10", log:"kg"},
+    {id:"grip", n:"Hand grip", rx:"75% PC", pc:75, log:"kg"}]},
+ ]},
+ {k:"mar", t:"Mar", blocks:[
+  {b:"Activación", ex:[
+    {id:"tiron", n:"Tirón medio muslo", rx:['3 × 3"','3 × 4"','3 × 5"']},
+    {id:"rotbal", n:"Rotación balística", rx:"3 × 4/4", log:"kg"},
+    {id:"flexreac", n:"Flexiones reactivas", rx:"3 × 3"}]},
+  {b:"C1", ex:[
+    {id:"remobarra", n:"Remo c/barra", rx:PX, pct:PCT, rm:"remo", log:"kg"},
+    {id:"cadera", n:"Elevación de cadera", rx:PX, pct:PCT, rm:"cadera", log:"kg"}]},
+  {b:"C2", sub:"Unipodal: elegí uno", ex:[
+    {id:"pressz", n:"Press Z", rx:["3 × 12-12-10 · RIR 2","3 × 10-10-10 · RIR 2","3 × 10-10-8 · RIR 2"], log:"kg"},
+    {id:"sarranque", n:"Sentadilla de arranque", tag:"unipodal", rx:"3 × 6-8 · RIR 3", log:"kg"},
+    {id:"bajcajon", n:"Bajada a cajón", tag:"unipodal", rx:"3 × 6-8 · RIR 3", log:"kg"},
+    {id:"pistola", n:"Sentadilla pistola", tag:"unipodal", rx:"3 × 6-8 · RIR 3", log:"kg"}]},
+  {b:"C3", ex:[
+    {id:"biceps", n:"Bíceps", rx:"3-6 × 10", log:"kg"},
+    {id:"hposterior", n:"Hombro posterior", rx:"3-6 × 10", log:"kg"}]},
+ ]},
+ {k:"mie", t:"Mié", blocks:[
+  {b:"C1", ex:[
+    {id:"bulgaras", n:"Búlgaras", rx:s3("6/6 · RIR 3"), log:"kg"},
+    {id:"renegado", n:"Remo renegado", rx:s3("6/6 · RIR 3"), log:"kg"}]},
+  {b:"C2", ex:[
+    {id:"dominada", n:"Dominada / semi-asistida", rx:s3("máx"), log:"reps"},
+    {id:"sumo", n:"Peso muerto sumo", rx:s3("6-8 · RIR 2"), log:"kg"}]},
+  {b:"C3", ex:[
+    {id:"sliders", n:"Curl de isquio c/sliders 2P", rx:s3("6")},
+    {id:"aperturas", n:"Aperturas en inclinado", rx:s3("8 · RIR 3"), log:"kg"}]},
+  {b:"C4", ex:[
+    {id:"biceps", n:"Bíceps", rx:"15-12-10", log:"kg"},
+    {id:"vuelos", n:"Vuelos", rx:"15-12-10", log:"kg"},
+    {id:"triceps", n:"Tríceps", rx:"15-12-10", log:"kg"}]},
+ ]},
+ {k:"jue", t:"Jue", blocks:[
+  {b:"Activación", ex:[
+    {id:"isobanco", n:"ISO push banco plano", rx:['3 × 3"','3 × 4"','3 × 5"']},
+    {id:"lanzmb", n:"Lanzamiento horizontal c/MB", rx:"3 × 5", log:"kg"},
+    {id:"isocatch", n:"ISO catch elevación cadera 1P", rx:["3 × 2/2","3 × 3/3","3 × 3/3"]}]},
+  {b:"C1", ex:[
+    {id:"remobarra", n:"Remo c/barra", rx:PX, pct:PCT, rm:"remo", log:"kg"},
+    {id:"cadera", n:"Elevación de cadera", rx:PX, pct:PCT, rm:"cadera", log:"kg"}]},
+  {b:"C2", ex:[
+    {id:"multidir", n:"Salto multidireccional", rx:"3 × 1 pasada"},
+    {id:"prisioneros", n:"Prisioneros", rx:"3 × 4"},
+    {id:"dropjump", n:"Drop jump CT 1 pie", tag:"opcional", rx:"3 × 3/3"},
+    {id:"catchflex", n:"ISO catch flexiones + salto", tag:"opcional", rx:"3 × 3-5"}]},
+  {b:"C3", ex:[
+    {id:"invertido", n:"Remo invertido", rx:"3 × 6 · ajustá ángulo y peso", log:"kg"},
+    {id:"copenhague", n:"Plancha Copenhague", rx:'3 × 20" c/l'}]},
+  {b:"C4", sub:"Orden fijo", ex:[
+    {id:"vfrontales", n:"Vuelos frontales", rx:["3 × 8 · RIR 2","3 × 10 · RIR 2","3 × 12 · RIR 2"], log:"kg"},
+    {id:"bancomanc", n:"Banco plano c/mancuernas", rx:["3 × 8 · RIR 2","3 × 10 · RIR 2","3 × 12 · RIR 2"], log:"kg"},
+    {id:"fondos", n:"Fondos", rx:["3 × 8 · RIR 2","3 × 10 · RIR 2","3 × 12 · RIR 2"], log:"kg"},
+    {id:"tricpolea", n:"Tríceps polea", rx:["3 × 8 · RIR 2","3 × 10 · RIR 2","3 × 12 · RIR 2"], log:"kg"},
+    {id:"remopolea", n:"Remo polea", rx:["3 × 8 · RIR 2","3 × 10 · RIR 2","3 × 12 · RIR 2"], log:"kg"}]},
+ ]},
+ {k:"g1", t:"Finde G1", blocks:[
+  {b:"C1", ex:[
+    {id:"pullapart", n:"Pull apart", rx:s3("15")},
+    {id:"lenador", n:"Leñador polea / disco", rx:s3("8/8"), log:"kg"},
+    {id:"isogemelos", n:"ISO push gemelos 1 pie", rx:s3('3-5" c/l')}]},
+  {b:"C2", ex:[
+    {id:"cruce", n:"Cruce de polea", rx:["3 × 12-10-8 · RIR 1-2","4 × 15-12-10-8",'5 × 15-12-10-8-(5 c/15")'], log:"kg"},
+    {id:"situp", n:"Sit up", rx:s3("12-15")},
+    {id:"hipthrust", n:"Hip thrust 1 pie", rx:s3("8/8 · RIR 2"), log:"kg"}]},
+  {b:"C3", ex:[
+    {id:"planchafit", n:"Plancha c/fitball rodilla al pecho", rx:s3("12-15")},
+    {id:"bicepstrx", n:"Bíceps TRX", rx:s3("12-15")}]},
+  {b:"C4", ex:[
+    {id:"agarre", n:"Agarre de barra", rx:"1 × máx tiempo · 75% PC", pc:75, log:"seg"}]},
+ ]},
+ {k:"g2", t:"Finde G2", blocks:[
+  {b:"C1", ex:[
+    {id:"facepull", n:"Face pull", rx:s3("15"), log:"kg"},
+    {id:"rotbanda", n:"Rotación c/banda – polea", rx:s3("8/8"), log:"kg"},
+    {id:"isohold", n:"ISO hold gemelos 1 pie", rx:s3('15-20" c/l')}]},
+  {b:"C2", ex:[
+    {id:"puentepress", n:"ISO puente + press", rx:["3 × 12-10-8 · RIR 1-2","4 × 15-12-10-8",'5 × 15-12-10-8-(5 c/15")'], log:"kg"},
+    {id:"abdcolgado", n:"Abdominal colgado de barra", rx:s3("12-15")},
+    {id:"estlateral", n:"Estocada lateral", rx:s3("6/6 · RIR 2"), log:"kg"}]},
+  {b:"C3", ex:[
+    {id:"bicho", n:"Bicho muerto c/fitball", rx:s3("12-15")},
+    {id:"wty", n:"W-T-Y TRX", rx:s3("12-15")}]},
+  {b:"C4", ex:[
+    {id:"colgado", n:"Colgado de barra más abierto que hombros", rx:"1 × máx tiempo", log:"seg"}]},
+ ]},
+];
+
+/* ---------- estado ---------- */
+const UNIT = {kg:"kg", reps:"reps", seg:"seg"};
+let docs = {};          // id -> {v:{exId:num}} | ajustes -> {rm:{}, pc}
+let backend = null;     // {save(id,data)}
+const ls = {
+  get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+const wd = new Date().getDay();
+let day  = ls.get("ub-dia", null) || ({1:"lun",2:"mar",3:"mie",4:"jue"}[wd] || "g1");
+let week = ls.get("ub-semana", 1);
+if (wd>=1 && wd<=4) day = ({1:"lun",2:"mar",3:"mie",4:"jue"})[wd];
+
+const sid = (w,d) => `${BLOCK_ID}-w${w}-${d}`;
+const fmt = n => (Math.round(n*100)/100).toString().replace(".",",");
+const parse = s => { s=String(s).trim().replace(",","."); if(!s) return null; const n=parseFloat(s); return isNaN(n)?undefined:n; };
+const pick = (v,w) => Array.isArray(v) ? v[w-1] : v;
+function rmOf(k){ const s=(docs.ajustes||{}).rm||{}; return (k in s) ? s[k] : (RMS.find(r=>r.k===k)||{}).def ?? null; }
+function pcOf(){ return (docs.ajustes||{}).pc ?? null; }
+function refFor(exId){
+  for(let w=week-1; w>=1; w--){ const v=docs[sid(w,day)]?.v?.[exId]; if(v!=null) return {w,v}; }
+  return null;
+}
+
+/* ---------- render ---------- */
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function renderNav(){
+  document.getElementById("weeks").innerHTML=[1,2,3].map(w=>
+    `<button type="button" data-w="${w}" aria-pressed="${w===week}">Semana ${w}<small>${["5 reps · 70%","3 reps · 75%","1 rep · 80%"][w-1]}</small></button>`).join("");
+  document.getElementById("days").innerHTML=DAYS.map(d=>
+    `<button type="button" data-d="${d.k}" aria-pressed="${d.k===day}">${d.t}</button>`).join("");
+}
+function renderAjustes(){
+  const pc = pcOf();
+  document.getElementById("rmgrid").innerHTML = RMS.map(r=>{
+    const v=rmOf(r.k);
+    return `<label for="rm-${r.k}">${esc(r.n)}<span class="field ${v!=null?'filled':''}"><input id="rm-${r.k}" data-rm="${r.k}" inputmode="decimal" autocomplete="off" value="${v!=null?fmt(v):''}" placeholder="—"><span>kg</span></span></label>`;
+  }).join("") + `<label for="pc-in">Peso corporal<span class="field ${pc!=null?'filled':''}"><input id="pc-in" data-pc="1" inputmode="decimal" autocomplete="off" value="${pc!=null?fmt(pc):''}" placeholder="—"><span>kg</span></span></label>`;
+}
+function renderMain(){
+  const d = DAYS.find(x=>x.k===day);
+  const cur = docs[sid(week,day)]?.v || {};
+  document.getElementById("main").innerHTML = d.blocks.map(b=>`
+    <section class="block">
+      <div class="bhead"><h3>${esc(b.b)}</h3>${b.sub?`<span>${esc(b.sub)}</span>`:""}</div>
+      ${b.ex.map(e=>{
+        const rx = pick(e.rx,week);
+        let chips = "";
+        if(e.pct){
+          const p=pick(e.pct,week), rm=rmOf(e.rm);
+          chips += rm!=null
+            ? `<span class="chip rm">${p}% RM → <b>${Math.round(rm*p/100)} kg</b></span>`
+            : `<button type="button" class="chip miss" data-open="1">${p}% RM · cargá tu RM</button>`;
+        }
+        if(e.pc){
+          const pc=pcOf();
+          chips += pc!=null
+            ? `<span class="chip pc">${e.pc}% PC → <b>${Math.round(pc*e.pc/100)} kg</b></span>`
+            : `<button type="button" class="chip miss" data-open="1">${e.pc}% PC · cargá tu peso</button>`;
+        }
+        let right = `<div class="none">—</div>`, ref="";
+        if(e.log){
+          const v=cur[e.id];
+          right = `<label class="field ${v!=null?'filled':''}" for="in-${e.id}"><input id="in-${e.id}" data-ex="${e.id}" inputmode="decimal" autocomplete="off" value="${v!=null?fmt(v):''}" placeholder="—" aria-label="${esc(e.n)} (${UNIT[e.log]})"><span>${UNIT[e.log]}</span></label>`;
+          const r=refFor(e.id);
+          ref = week===1 ? "" : `<div class="ref">${r?`Semana ${r.w}: <b>${fmt(r.v)} ${UNIT[e.log]}</b>`:"Semana anterior: sin dato"}</div>`;
+        }
+        return `<div class="ex"><div style="min-width:0">
+            <div class="name">${esc(e.n)}${e.tag?`<em>${esc(e.tag)}</em>`:""}</div>
+            <div class="rx"><span>${esc(rx)}</span>${chips}</div>${ref}
+          </div>${right}</div>`;
+      }).join("")}
+    </section>`).join("");
+}
+function renderAll(){ renderNav(); renderMain(); renderAjustes(); }
+function safeRender(){
+  const a=document.activeElement;
+  if(a && a.tagName==="INPUT") return;  // no pisar lo que estás escribiendo
+  renderMain(); renderAjustes();
+}
+function setStatus(cls,txt){const s=document.getElementById("status");s.className="status "+cls;s.querySelector("span").textContent=txt;}
+
+/* ---------- eventos ---------- */
+document.addEventListener("click",ev=>{
+  const w=ev.target.closest("[data-w]"), d=ev.target.closest("[data-d]"), o=ev.target.closest("[data-open]");
+  if(w){week=+w.dataset.w; ls.set("ub-semana",week); renderNav(); renderMain();}
+  if(d){day=d.dataset.d; ls.set("ub-dia",day); renderNav(); renderMain(); window.scrollTo({top:0});}
+  if(o||ev.target.id==="rmbtn"){
+    const p=document.getElementById("ajustes"), b=document.getElementById("rmbtn");
+    const open = o ? true : p.hidden;
+    p.hidden=!open; b.setAttribute("aria-expanded",open);
+    if(open) p.scrollIntoView({block:"nearest"});
+  }
+});
+document.addEventListener("keydown",ev=>{ if(ev.key==="Enter" && ev.target.tagName==="INPUT") ev.target.blur(); });
+document.addEventListener("change",ev=>{
+  const t=ev.target; const n=parse(t.value);
+  if(n===undefined){ t.value=""; return; }
+  if(t.dataset.ex){
+    const id=sid(week,day); const doc={v:{...(docs[id]?.v||{})}};
+    if(n==null) delete doc.v[t.dataset.ex]; else doc.v[t.dataset.ex]=n;
+    docs[id]=doc; backend.save(id,doc);
+  } else if(t.dataset.rm || t.dataset.pc){
+    const a={rm:{...((docs.ajustes||{}).rm||{})}, pc:(docs.ajustes||{}).pc ?? null};
+    if(t.dataset.rm) a.rm[t.dataset.rm]=n; else a.pc=n;
+    docs.ajustes=a; backend.save("ajustes",a);
+  } else return;
+  t.closest(".field")?.classList.toggle("filled", n!=null);
+  t.value = n!=null ? fmt(n) : "";
+  if(t.dataset.rm || t.dataset.pc) renderMain();
+});
+document.addEventListener("focusout",()=>setTimeout(()=>{ if(document.activeElement?.tagName!=="INPUT") { renderMain(); } },0));
+
+/* ---------- guardado (en el dispositivo) ---------- */
+function start(){
+  docs = ls.get("ub-docs", {});
+  backend = { save(){ ls.set("ub-docs",docs);
+    try{ localStorage.getItem("ub-docs"); setStatus("ok","Guardado en este dispositivo"); }catch(e){ setStatus("warn","No se pudo guardar"); } } };
+  let ok=true; try{ localStorage.setItem("ub-test","1"); localStorage.removeItem("ub-test"); }catch(e){ ok=false; }
+  setStatus(ok?"ok":"warn", ok?"Guardado en este dispositivo":"Este navegador no permite guardar (¿modo incógnito?)");
+  renderAll();
+}
+document.getElementById("exportar").addEventListener("click",()=>{
+  const blob=new Blob([JSON.stringify({app:"rutina-ub",fecha:new Date().toISOString(),docs},null,1)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download="rutina-ub-"+new Date().toISOString().slice(0,10)+".json";
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  document.getElementById("bkmsg").textContent="Copia descargada.";
+});
+document.getElementById("importar").addEventListener("click",()=>document.getElementById("archivo").click());
+document.getElementById("archivo").addEventListener("change",ev=>{
+  const f=ev.target.files[0]; if(!f) return;
+  f.text().then(t=>{
+    const j=JSON.parse(t); if(!j||j.app!=="rutina-ub"||typeof j.docs!=="object") throw 0;
+    docs=j.docs; ls.set("ub-docs",docs); renderAll();
+    document.getElementById("bkmsg").textContent="Copia restaurada.";
+  }).catch(()=>{ document.getElementById("bkmsg").textContent="Ese archivo no es una copia de esta app."; });
+  ev.target.value="";
+});
+if("serviceWorker" in navigator){ window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{})); }
+start();
+</script>
+</body>
+</html>
