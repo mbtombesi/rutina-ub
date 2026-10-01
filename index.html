@@ -96,6 +96,35 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 .backup h4{margin:0 0 4px;font:800 16px var(--display);text-transform:uppercase}
 .backup .btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
 .btn2{font:700 13px var(--body);padding:9px 12px;border-radius:6px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer}
+.hbtns{display:flex;gap:6px;flex:none}
+.rmbtn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 2px var(--ink)}
+.rmbtn.ghost[aria-pressed="true"]{background:var(--hot);color:var(--card);box-shadow:none}
+body.editing header{border-bottom-color:var(--hot)}
+.in{width:100%;min-width:0;font:500 15px var(--body);padding:8px 9px;border:1.5px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink)}
+.in:focus{outline:none;border-color:var(--accent)}
+.edhint{background:var(--hot-soft);color:var(--hot);border-radius:6px;padding:10px 12px;font-size:13px;margin-top:12px}
+.edday{display:flex;gap:8px;align-items:flex-end;margin-top:14px}
+.edday label{flex:1;min-width:0}
+.edday label,.edgrid label,.edrow label,.edex>label,.newrm label{display:flex;flex-direction:column;gap:3px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;min-width:0}
+.edbhead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;border-bottom:1px solid var(--line);padding-bottom:8px}
+.edbhead .in.big{font:900 22px var(--display);text-transform:uppercase;flex:1 1 120px;padding:4px 9px}
+.edbhead .in.small{flex:2 1 160px}
+.edex{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px;margin-top:10px;display:grid;gap:10px}
+.edex .in.name{font-weight:700}
+.edgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.edrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.tools{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+.tb{font:700 13px var(--body);min-width:38px;padding:7px 10px;border-radius:6px;border:1.5px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.tb:disabled{opacity:.35;cursor:default}
+.tb.del{color:var(--hot);border-color:var(--hot)}
+.add{width:100%;margin-top:10px;font:700 14px var(--body);padding:11px;border:1.5px dashed var(--accent);color:var(--accent);background:transparent;border-radius:8px;cursor:pointer}
+.add.big{margin-top:22px;font-size:15px;padding:14px}
+.edfoot{margin-top:28px;display:flex;justify-content:center}
+.days .dayadd{color:var(--hot)}
+.empty{margin-top:24px;color:var(--muted)}
+.rmcell{display:flex;gap:6px;align-items:flex-end}
+.rmcell label{flex:1;min-width:0}
+.newrm{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) auto;gap:8px;align-items:end;margin-top:12px}
 @media (max-width:520px){h1{font-size:24px}.eyebrow{font-size:10px}header{padding-block:10px 6px}.weeks{margin-top:8px}.weeks button{font-size:16px;padding:4px 0}.weeks button small{font-size:9px}.days button{padding:6px 9px;font-size:12px}.rmbtn{padding:7px 10px;font-size:12px}}
 @media (max-width:380px){.ex{grid-template-columns:minmax(0,1fr) 92px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -109,7 +138,10 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
         <div class="eyebrow">Unión Bahía · Tombesi</div>
         <h1>Rutina de fuerza</h1>
       </div>
-      <button class="rmbtn" id="rmbtn" aria-expanded="false" aria-controls="ajustes">Mis RM</button>
+      <div class="hbtns">
+        <button class="rmbtn ghost" id="edbtn" aria-pressed="false">Editar</button>
+        <button class="rmbtn" id="rmbtn" aria-expanded="false" aria-controls="ajustes">Mis RM</button>
+      </div>
     </div>
     <div class="weeks" id="weeks"></div>
     <nav class="days" id="days"></nav>
@@ -117,11 +149,16 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
 
   <section id="ajustes" hidden>
     <h2>Mis RM y peso corporal</h2>
-    <p>Los RM vienen de la tabla del club. Si te toman un test nuevo, cambialo acá y los porcentajes se recalculan solos. El peso corporal sirve para los ejercicios con % PC.</p>
+    <p>Si te toman un test nuevo, cambialo acá y los porcentajes se recalculan solos. El peso corporal sirve para los ejercicios con % PC.</p>
     <div class="rmgrid" id="rmgrid"></div>
+    <div class="newrm">
+      <label for="newrm-n">Agregar RM<input class="in" id="newrm-n" placeholder="Ej: Peso muerto" autocomplete="off"></label>
+      <label for="newrm-v">kg<input class="in" id="newrm-v" inputmode="decimal" placeholder="—" autocomplete="off"></label>
+      <button type="button" class="btn2" data-act="rmadd">Agregar</button>
+    </div>
     <div class="backup">
       <h4>Copia de seguridad</h4>
-      <p>Tus registros quedan guardados en este celu. Bajá una copia cada tanto, o para pasarlos a otro dispositivo.</p>
+      <p>Tus registros y tu rutina quedan guardados en este celu. Bajá una copia cada tanto, o para pasarlos a otro dispositivo.</p>
       <div class="btns">
         <button type="button" class="btn2" id="exportar">Descargar copia</button>
         <button type="button" class="btn2" id="importar">Restaurar copia</button>
@@ -131,14 +168,13 @@ button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline
     </div>
   </section>
 
-  <div class="status" id="status"><i></i><span>Conectando…</span></div>
+  <div class="status" id="status"><i></i><span>Cargando…</span></div>
   <main id="main"></main>
-  <p class="foot">Los pesos son opcionales: cargá solo lo que quieras. Se guarda en el celu al salir del casillero. Cargas por % redondeadas al kg, igual que la tabla del club.</p>
+  <p class="foot" id="foot">Los pesos son opcionales: cargá solo lo que quieras. Se guarda en el celu al salir del casillero. Cargas por % redondeadas al kg, igual que la tabla del club.</p>
 </div>
 
 <script>
-const BLOCK_ID = "b1"; // Planificación semanas 1–3
-const RMS = [
+const DEF_RMS = [
   {k:"press",      n:"Press de hombros", def:41},
   {k:"remo",       n:"Remo (prono / c/barra)", def:57},
   {k:"cadera",     n:"Elevación de cadera", def:160},
@@ -255,93 +291,233 @@ const DAYS = [
  ]},
 ];
 
+
 /* ---------- estado ---------- */
 const UNIT = {kg:"kg", reps:"reps", seg:"seg"};
-let docs = {};          // id -> {v:{exId:num}} | ajustes -> {rm:{}, pc}
-let backend = null;     // {save(id,data)}
 const ls = {
   get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},
-  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}
 };
+const clone = o => JSON.parse(JSON.stringify(o));
+const W3 = (v) => [0,1,2].map(i => Array.isArray(v) ? (v[i] ?? null) : (v ?? null));
+function norm(days){
+  return days.map(d=>({k:d.k, t:d.t, blocks:d.blocks.map(b=>({b:b.b, sub:b.sub||"", ex:b.ex.map(e=>({
+    id:e.id, n:e.n, tag:e.tag||"", rx:W3(e.rx).map(x=>x||""), pct:W3(e.pct),
+    rm:e.rm||"", pc:e.pc ?? null, log:e.log||""
+  }))}))}));
+}
+const defaultRutina = () => ({v:1, rms:clone(DEF_RMS), days:norm(DAYS)});
+let rutina = ls.get("ub-rutina", null) || defaultRutina();
+let docs = ls.get("ub-docs", {});
+let editing = false;
+const BLOCK_ID = "b1";
 const wd = new Date().getDay();
-let day  = ls.get("ub-dia", null) || ({1:"lun",2:"mar",3:"mie",4:"jue"}[wd] || "g1");
 let week = ls.get("ub-semana", 1);
-if (wd>=1 && wd<=4) day = ({1:"lun",2:"mar",3:"mie",4:"jue"})[wd];
-
+let day = ({1:"lun",2:"mar",3:"mie",4:"jue"})[wd] || ls.get("ub-dia", null) || "g1";
+function fixDay(){ if(!rutina.days.some(d=>d.k===day)) day = rutina.days[0]?.k; }
+fixDay();
+const curDay = () => rutina.days.find(d=>d.k===day) || rutina.days[0];
 const sid = (w,d) => `${BLOCK_ID}-w${w}-${d}`;
 const fmt = n => (Math.round(n*100)/100).toString().replace(".",",");
 const parse = s => { s=String(s).trim().replace(",","."); if(!s) return null; const n=parseFloat(s); return isNaN(n)?undefined:n; };
-const pick = (v,w) => Array.isArray(v) ? v[w-1] : v;
-function rmOf(k){ const s=(docs.ajustes||{}).rm||{}; return (k in s) ? s[k] : (RMS.find(r=>r.k===k)||{}).def ?? null; }
+const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+function rmOf(k){
+  if(!k) return null;
+  const s=(docs.ajustes||{}).rm||{};
+  if(k in s) return s[k];
+  const r=rutina.rms.find(r=>r.k===k); return r ? (r.def ?? null) : null;
+}
 function pcOf(){ return (docs.ajustes||{}).pc ?? null; }
 function refFor(exId){
   for(let w=week-1; w>=1; w--){ const v=docs[sid(w,day)]?.v?.[exId]; if(v!=null) return {w,v}; }
   return null;
 }
+function saveDocs(){ if(ls.set("ub-docs",docs)) setStatus("ok","Guardado en este dispositivo"); else setStatus("warn","No se pudo guardar"); }
+function saveRutina(){ if(ls.set("ub-rutina",rutina)) setStatus("ok","Rutina guardada"); else setStatus("warn","No se pudo guardar la rutina"); }
 
 /* ---------- render ---------- */
-function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function weekLabel(w){
+  for(const d of rutina.days) for(const b of d.blocks) for(const e of b.ex)
+    if(e.pct[w-1]!=null) return `${e.rx[w-1]} · ${e.pct[w-1]}%`;
+  return "";
+}
 function renderNav(){
-  document.getElementById("weeks").innerHTML=[1,2,3].map(w=>
-    `<button type="button" data-w="${w}" aria-pressed="${w===week}">Semana ${w}<small>${["5 reps · 70%","3 reps · 75%","1 rep · 80%"][w-1]}</small></button>`).join("");
-  document.getElementById("days").innerHTML=DAYS.map(d=>
-    `<button type="button" data-d="${d.k}" aria-pressed="${d.k===day}">${d.t}</button>`).join("");
+  document.getElementById("weeks").innerHTML=[1,2,3].map(w=>{
+    const l=weekLabel(w);
+    return `<button type="button" data-w="${w}" aria-pressed="${w===week}">Semana ${w}${l?`<small>${esc(l)}</small>`:""}</button>`;
+  }).join("");
+  document.getElementById("days").innerHTML=rutina.days.map(d=>
+    `<button type="button" data-d="${esc(d.k)}" aria-pressed="${d.k===day}">${esc(d.t)}</button>`).join("")
+    + (editing?`<button type="button" class="dayadd" data-act="dadd">+ Día</button>`:"");
+  document.getElementById("edbtn").setAttribute("aria-pressed",editing);
+  document.getElementById("edbtn").textContent = editing ? "Listo" : "Editar";
+  document.body.classList.toggle("editing",editing);
+  document.getElementById("foot").hidden = editing;
 }
 function renderAjustes(){
   const pc = pcOf();
-  document.getElementById("rmgrid").innerHTML = RMS.map(r=>{
-    const v=rmOf(r.k);
-    return `<label for="rm-${r.k}">${esc(r.n)}<span class="field ${v!=null?'filled':''}"><input id="rm-${r.k}" data-rm="${r.k}" inputmode="decimal" autocomplete="off" value="${v!=null?fmt(v):''}" placeholder="—"><span>kg</span></span></label>`;
-  }).join("") + `<label for="pc-in">Peso corporal<span class="field ${pc!=null?'filled':''}"><input id="pc-in" data-pc="1" inputmode="decimal" autocomplete="off" value="${pc!=null?fmt(pc):''}" placeholder="—"><span>kg</span></span></label>`;
+  document.getElementById("rmgrid").innerHTML = rutina.rms.map(r=>{
+    const v=rmOf(r.k), custom=!DEF_RMS.some(d=>d.k===r.k);
+    return `<div class="rmcell"><label for="rm-${esc(r.k)}">${esc(r.n)}<span class="field ${v!=null?'filled':''}"><input id="rm-${esc(r.k)}" data-rm="${esc(r.k)}" inputmode="decimal" autocomplete="off" value="${v!=null?fmt(v):''}" placeholder="—"><span>kg</span></span></label>${custom?`<button type="button" class="tb del" data-act="rmdel" data-k="${esc(r.k)}" aria-label="Borrar ${esc(r.n)}">✕</button>`:""}</div>`;
+  }).join("") + `<div class="rmcell"><label for="pc-in">Peso corporal<span class="field ${pc!=null?'filled':''}"><input id="pc-in" data-pc="1" inputmode="decimal" autocomplete="off" value="${pc!=null?fmt(pc):''}" placeholder="—"><span>kg</span></span></label></div>`;
 }
-function renderMain(){
-  const d = DAYS.find(x=>x.k===day);
+function renderView(d){
   const cur = docs[sid(week,day)]?.v || {};
-  document.getElementById("main").innerHTML = d.blocks.map(b=>`
+  if(!d.blocks.length) return `<p class="empty">Este día no tiene ejercicios. Tocá <b>Editar</b> para cargarlos.</p>`;
+  return d.blocks.map(b=>`
     <section class="block">
       <div class="bhead"><h3>${esc(b.b)}</h3>${b.sub?`<span>${esc(b.sub)}</span>`:""}</div>
       ${b.ex.map(e=>{
-        const rx = pick(e.rx,week);
+        const rx = e.rx[week-1]||"";
         let chips = "";
-        if(e.pct){
-          const p=pick(e.pct,week), rm=rmOf(e.rm);
+        const p = e.pct[week-1];
+        if(p!=null){
+          const rm=rmOf(e.rm);
           chips += rm!=null
-            ? `<span class="chip rm">${p}% RM → <b>${Math.round(rm*p/100)} kg</b></span>`
-            : `<button type="button" class="chip miss" data-open="1">${p}% RM · cargá tu RM</button>`;
+            ? `<span class="chip rm">${fmt(p)}% RM → <b>${Math.round(rm*p/100)} kg</b></span>`
+            : `<button type="button" class="chip miss" data-open="1">${fmt(p)}% RM · cargá tu RM</button>`;
         }
-        if(e.pc){
+        if(e.pc!=null){
           const pc=pcOf();
           chips += pc!=null
-            ? `<span class="chip pc">${e.pc}% PC → <b>${Math.round(pc*e.pc/100)} kg</b></span>`
-            : `<button type="button" class="chip miss" data-open="1">${e.pc}% PC · cargá tu peso</button>`;
+            ? `<span class="chip pc">${fmt(e.pc)}% PC → <b>${Math.round(pc*e.pc/100)} kg</b></span>`
+            : `<button type="button" class="chip miss" data-open="1">${fmt(e.pc)}% PC · cargá tu peso</button>`;
         }
         let right = `<div class="none">—</div>`, ref="";
         if(e.log){
           const v=cur[e.id];
-          right = `<label class="field ${v!=null?'filled':''}" for="in-${e.id}"><input id="in-${e.id}" data-ex="${e.id}" inputmode="decimal" autocomplete="off" value="${v!=null?fmt(v):''}" placeholder="—" aria-label="${esc(e.n)} (${UNIT[e.log]})"><span>${UNIT[e.log]}</span></label>`;
+          right = `<label class="field ${v!=null?'filled':''}" for="in-${esc(e.id)}"><input id="in-${esc(e.id)}" data-ex="${esc(e.id)}" inputmode="decimal" autocomplete="off" value="${v!=null?fmt(v):''}" placeholder="—" aria-label="${esc(e.n)} (${UNIT[e.log]})"><span>${UNIT[e.log]}</span></label>`;
           const r=refFor(e.id);
           ref = week===1 ? "" : `<div class="ref">${r?`Semana ${r.w}: <b>${fmt(r.v)} ${UNIT[e.log]}</b>`:"Semana anterior: sin dato"}</div>`;
         }
         return `<div class="ex"><div style="min-width:0">
             <div class="name">${esc(e.n)}${e.tag?`<em>${esc(e.tag)}</em>`:""}</div>
-            <div class="rx"><span>${esc(rx)}</span>${chips}</div>${ref}
+            <div class="rx">${rx?`<span>${esc(rx)}</span>`:""}${chips}</div>${ref}
           </div>${right}</div>`;
       }).join("")}
     </section>`).join("");
 }
-function renderAll(){ renderNav(); renderMain(); renderAjustes(); }
-function safeRender(){
-  const a=document.activeElement;
-  if(a && a.tagName==="INPUT") return;  // no pisar lo que estás escribiendo
-  renderMain(); renderAjustes();
+function renderEdit(d){
+  const rmOpts = sel => `<option value="">Ninguno</option>` + rutina.rms.map(r=>`<option value="${esc(r.k)}" ${r.k===sel?"selected":""}>${esc(r.n)}</option>`).join("");
+  const logOpts = sel => [["kg","Peso (kg)"],["reps","Repeticiones"],["seg","Segundos"],["","No registrar"]].map(([v,t])=>`<option value="${v}" ${v===sel?"selected":""}>${t}</option>`).join("");
+  const n = d.blocks.length;
+  return `
+  <div class="edhint">Modo edición. Los cambios se guardan solos. Tocá <b>Listo</b> arriba cuando termines.</div>
+  <div class="edday">
+    <label for="ed-day">Nombre del día<input class="in" id="ed-day" data-f="dayname" value="${esc(d.t)}" autocomplete="off"></label>
+    <button type="button" class="tb del" data-act="ddel" ${rutina.days.length<2?"disabled":""}>Borrar día</button>
+  </div>
+  ${d.blocks.map((b,bi)=>`
+    <section class="block ed">
+      <div class="edbhead">
+        <input class="in big" id="ed-b${bi}" data-b="${bi}" data-f="b" value="${esc(b.b)}" aria-label="Nombre del bloque" autocomplete="off">
+        <input class="in small" id="ed-s${bi}" data-b="${bi}" data-f="sub" value="${esc(b.sub)}" placeholder="Nota del bloque (opcional)" aria-label="Nota del bloque" autocomplete="off">
+        <div class="tools">
+          <button type="button" class="tb" data-act="bup" data-b="${bi}" ${bi===0?"disabled":""} aria-label="Subir bloque">↑</button>
+          <button type="button" class="tb" data-act="bdown" data-b="${bi}" ${bi===n-1?"disabled":""} aria-label="Bajar bloque">↓</button>
+          <button type="button" class="tb del" data-act="bdel" data-b="${bi}">Borrar bloque</button>
+        </div>
+      </div>
+      ${b.ex.map((e,ei)=>{ const id=`${bi}-${ei}`, A=`data-b="${bi}" data-e="${ei}"`; return `
+      <div class="edex">
+        <label for="ed-n${id}">Ejercicio<input class="in name" id="ed-n${id}" ${A} data-f="n" value="${esc(e.n)}" autocomplete="off"></label>
+        <div class="edgrid">
+          ${[0,1,2].map(i=>`<label for="ed-rx${id}-${i}">Series × reps S${i+1}<input class="in" id="ed-rx${id}-${i}" ${A} data-f="rx${i}" value="${esc(e.rx[i])}" placeholder="3 × 10" autocomplete="off"></label>`).join("")}
+          ${[0,1,2].map(i=>`<label for="ed-p${id}-${i}">% RM S${i+1}<input class="in" id="ed-p${id}-${i}" ${A} data-f="pct${i}" inputmode="decimal" value="${e.pct[i]!=null?fmt(e.pct[i]):""}" placeholder="—" autocomplete="off"></label>`).join("")}
+        </div>
+        <div class="edrow">
+          <label for="ed-rm${id}">% calculado sobre<select class="in" id="ed-rm${id}" ${A} data-f="rm">${rmOpts(e.rm)}</select></label>
+          <label for="ed-pc${id}">% peso corporal<input class="in" id="ed-pc${id}" ${A} data-f="pc" inputmode="decimal" value="${e.pc!=null?fmt(e.pc):""}" placeholder="—" autocomplete="off"></label>
+          <label for="ed-log${id}">Qué registro<select class="in" id="ed-log${id}" ${A} data-f="log">${logOpts(e.log)}</select></label>
+          <label for="ed-tag${id}">Etiqueta<input class="in" id="ed-tag${id}" ${A} data-f="tag" value="${esc(e.tag)}" placeholder="opcional" autocomplete="off"></label>
+        </div>
+        <div class="tools">
+          <button type="button" class="tb" data-act="eup" ${A} ${ei===0?"disabled":""} aria-label="Subir ejercicio">↑</button>
+          <button type="button" class="tb" data-act="edown" ${A} ${ei===b.ex.length-1?"disabled":""} aria-label="Bajar ejercicio">↓</button>
+          <button type="button" class="tb del" data-act="edel" ${A}>Borrar</button>
+        </div>
+      </div>`;}).join("")}
+      <button type="button" class="add" data-act="eadd" data-b="${bi}">+ Agregar ejercicio</button>
+    </section>`).join("")}
+  <button type="button" class="add big" data-act="badd">+ Agregar bloque</button>
+  <div class="edfoot">
+    <button type="button" class="tb del" data-act="reset">Volver a la rutina original del club</button>
+  </div>`;
 }
+function renderMain(){
+  const d=curDay();
+  document.getElementById("main").innerHTML = d ? (editing ? renderEdit(d) : renderView(d)) : "";
+}
+function renderAll(){ renderNav(); renderMain(); renderAjustes(); }
 function setStatus(cls,txt){const s=document.getElementById("status");s.className="status "+cls;s.querySelector("span").textContent=txt;}
+
+/* ---------- edición ---------- */
+const swap = (arr,i,j) => { if(j<0||j>=arr.length) return; [arr[i],arr[j]]=[arr[j],arr[i]]; };
+function focusLater(id){ setTimeout(()=>{ const el=document.getElementById(id); if(el){ el.focus(); el.select?.(); el.scrollIntoView({block:"center"}); } },0); }
+function act(btn){
+  const a=btn.dataset.act, d=curDay(), bi=+btn.dataset.b, ei=+btn.dataset.e;
+  const blocks=d?.blocks, b=blocks?.[bi];
+  switch(a){
+    case "bup": swap(blocks,bi,bi-1); break;
+    case "bdown": swap(blocks,bi,bi+1); break;
+    case "bdel": if(!confirm(`¿Borrar el bloque "${b.b}" con sus ${b.ex.length} ejercicios?`)) return; blocks.splice(bi,1); break;
+    case "badd": blocks.push({b:"C"+(blocks.filter(x=>/^C\d/.test(x.b)).length+1), sub:"", ex:[]}); saveRutina(); renderMain(); focusLater(`ed-b${blocks.length-1}`); return;
+    case "eup": swap(b.ex,ei,ei-1); break;
+    case "edown": swap(b.ex,ei,ei+1); break;
+    case "edel": if(!confirm(`¿Borrar "${b.ex[ei].n}"?`)) return; b.ex.splice(ei,1); break;
+    case "eadd": b.ex.push({id:uid("e"), n:"Nuevo ejercicio", tag:"", rx:["","",""], pct:[null,null,null], rm:"", pc:null, log:"kg"}); saveRutina(); renderMain(); focusLater(`ed-n${bi}-${b.ex.length-1}`); return;
+    case "dadd": { const k=uid("d"); rutina.days.push({k, t:"Día nuevo", blocks:[]}); day=k; saveRutina(); renderNav(); renderMain(); focusLater("ed-day"); return; }
+    case "ddel": if(rutina.days.length<2 || !confirm(`¿Borrar el día "${d.t}" entero?`)) return; rutina.days=rutina.days.filter(x=>x!==d); fixDay(); saveRutina(); renderNav(); renderMain(); return;
+    case "reset": if(!confirm("¿Volver a la rutina original del club? Se pierden los cambios que hiciste a la rutina (tus pesos registrados no se borran).")) return; rutina=defaultRutina(); fixDay(); saveRutina(); renderAll(); return;
+    case "rmadd": {
+      const n=document.getElementById("newrm-n").value.trim(); const v=parse(document.getElementById("newrm-v").value);
+      if(!n){ document.getElementById("newrm-n").focus(); return; }
+      const k=uid("rm"); rutina.rms.push({k, n, def:null}); saveRutina();
+      if(v!=null){ docs.ajustes={rm:{...((docs.ajustes||{}).rm||{}), [k]:v}, pc:(docs.ajustes||{}).pc ?? null}; saveDocs(); }
+      document.getElementById("newrm-n").value=""; document.getElementById("newrm-v").value="";
+      renderAjustes(); renderMain(); return;
+    }
+    case "rmdel": {
+      const k=btn.dataset.k, r=rutina.rms.find(x=>x.k===k);
+      if(!r || !confirm(`¿Borrar el RM "${r.n}"? Los ejercicios que lo usaban quedan sin cálculo de %.`)) return;
+      rutina.rms=rutina.rms.filter(x=>x.k!==k);
+      rutina.days.forEach(dd=>dd.blocks.forEach(bb=>bb.ex.forEach(e=>{ if(e.rm===k) e.rm=""; })));
+      saveRutina(); renderAjustes(); renderMain(); return;
+    }
+    default: return;
+  }
+  saveRutina(); renderMain();
+}
+function editField(t){
+  const f=t.dataset.f, d=curDay(); if(!d) return;
+  if(f==="dayname"){ d.t=t.value.trim()||"Día"; saveRutina(); renderNav(); return; }
+  const b=d.blocks[+t.dataset.b]; if(!b) return;
+  if(f==="b"){ b.b=t.value.trim()||"Bloque"; saveRutina(); return; }
+  if(f==="sub"){ b.sub=t.value.trim(); saveRutina(); return; }
+  const e=b.ex[+t.dataset.e]; if(!e) return;
+  if(f==="n"){ e.n=t.value.trim()||"Ejercicio"; }
+  else if(f==="tag"){ e.tag=t.value.trim(); }
+  else if(f.startsWith("rx")){ e.rx[+f.slice(2)]=t.value.trim(); }
+  else if(f.startsWith("pct")||f==="pc"){
+    const n=parse(t.value); if(n===undefined){ t.value=""; }
+    const v = n===undefined ? null : n;
+    if(f==="pc") e.pc=v; else e.pct[+f.slice(3)]=v;
+    t.value = v!=null ? fmt(v) : "";
+  }
+  else if(f==="rm"){ e.rm=t.value; }
+  else if(f==="log"){ e.log=t.value; }
+  saveRutina();
+  if(f.startsWith("pct")||f.startsWith("rx")) renderNav();
+}
 
 /* ---------- eventos ---------- */
 document.addEventListener("click",ev=>{
-  const w=ev.target.closest("[data-w]"), d=ev.target.closest("[data-d]"), o=ev.target.closest("[data-open]");
+  const w=ev.target.closest("[data-w]"), d=ev.target.closest("[data-d]"), o=ev.target.closest("[data-open]"), a=ev.target.closest("[data-act]");
+  if(a){ act(a); return; }
   if(w){week=+w.dataset.w; ls.set("ub-semana",week); renderNav(); renderMain();}
   if(d){day=d.dataset.d; ls.set("ub-dia",day); renderNav(); renderMain(); window.scrollTo({top:0});}
+  if(ev.target.id==="edbtn"){ editing=!editing; document.getElementById("ajustes").hidden=true; document.getElementById("rmbtn").setAttribute("aria-expanded",false); renderNav(); renderMain(); window.scrollTo({top:0}); }
   if(o||ev.target.id==="rmbtn"){
     const p=document.getElementById("ajustes"), b=document.getElementById("rmbtn");
     const open = o ? true : p.hidden;
@@ -351,34 +527,29 @@ document.addEventListener("click",ev=>{
 });
 document.addEventListener("keydown",ev=>{ if(ev.key==="Enter" && ev.target.tagName==="INPUT") ev.target.blur(); });
 document.addEventListener("change",ev=>{
-  const t=ev.target; const n=parse(t.value);
+  const t=ev.target;
+  if(t.dataset.f){ editField(t); return; }
+  if(t.id==="newrm-n"||t.id==="newrm-v"||t.id==="archivo") return;
+  const n=parse(t.value);
   if(n===undefined){ t.value=""; return; }
   if(t.dataset.ex){
     const id=sid(week,day); const doc={v:{...(docs[id]?.v||{})}};
     if(n==null) delete doc.v[t.dataset.ex]; else doc.v[t.dataset.ex]=n;
-    docs[id]=doc; backend.save(id,doc);
+    docs[id]=doc; saveDocs();
   } else if(t.dataset.rm || t.dataset.pc){
     const a={rm:{...((docs.ajustes||{}).rm||{})}, pc:(docs.ajustes||{}).pc ?? null};
     if(t.dataset.rm) a.rm[t.dataset.rm]=n; else a.pc=n;
-    docs.ajustes=a; backend.save("ajustes",a);
+    docs.ajustes=a; saveDocs();
   } else return;
   t.closest(".field")?.classList.toggle("filled", n!=null);
   t.value = n!=null ? fmt(n) : "";
   if(t.dataset.rm || t.dataset.pc) renderMain();
 });
-document.addEventListener("focusout",()=>setTimeout(()=>{ if(document.activeElement?.tagName!=="INPUT") { renderMain(); } },0));
+document.addEventListener("focusout",()=>setTimeout(()=>{ if(!editing && document.activeElement?.tagName!=="INPUT") renderMain(); },0));
 
-/* ---------- guardado (en el dispositivo) ---------- */
-function start(){
-  docs = ls.get("ub-docs", {});
-  backend = { save(){ ls.set("ub-docs",docs);
-    try{ localStorage.getItem("ub-docs"); setStatus("ok","Guardado en este dispositivo"); }catch(e){ setStatus("warn","No se pudo guardar"); } } };
-  let ok=true; try{ localStorage.setItem("ub-test","1"); localStorage.removeItem("ub-test"); }catch(e){ ok=false; }
-  setStatus(ok?"ok":"warn", ok?"Guardado en este dispositivo":"Este navegador no permite guardar (¿modo incógnito?)");
-  renderAll();
-}
+/* ---------- copia de seguridad ---------- */
 document.getElementById("exportar").addEventListener("click",()=>{
-  const blob=new Blob([JSON.stringify({app:"rutina-ub",fecha:new Date().toISOString(),docs},null,1)],{type:"application/json"});
+  const blob=new Blob([JSON.stringify({app:"rutina-ub",fecha:new Date().toISOString(),docs,rutina},null,1)],{type:"application/json"});
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
   a.download="rutina-ub-"+new Date().toISOString().slice(0,10)+".json";
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
@@ -389,13 +560,21 @@ document.getElementById("archivo").addEventListener("change",ev=>{
   const f=ev.target.files[0]; if(!f) return;
   f.text().then(t=>{
     const j=JSON.parse(t); if(!j||j.app!=="rutina-ub"||typeof j.docs!=="object") throw 0;
-    docs=j.docs; ls.set("ub-docs",docs); renderAll();
+    docs=j.docs; ls.set("ub-docs",docs);
+    if(j.rutina && Array.isArray(j.rutina.days)){ rutina=j.rutina; ls.set("ub-rutina",rutina); fixDay(); }
+    renderAll();
     document.getElementById("bkmsg").textContent="Copia restaurada.";
   }).catch(()=>{ document.getElementById("bkmsg").textContent="Ese archivo no es una copia de esta app."; });
   ev.target.value="";
 });
+
+/* ---------- inicio ---------- */
+(function start(){
+  let ok=true; try{ localStorage.setItem("ub-test","1"); localStorage.removeItem("ub-test"); }catch(e){ ok=false; }
+  setStatus(ok?"ok":"warn", ok?"Guardado en este dispositivo":"Este navegador no permite guardar (¿modo incógnito?)");
+  renderAll();
+})();
 if("serviceWorker" in navigator){ window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{})); }
-start();
 </script>
 </body>
 </html>

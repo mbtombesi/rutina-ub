@@ -1,5 +1,5 @@
 // Guarda la app para que abra sin internet. Cambiá VERSION cuando actualices la rutina.
-const VERSION = "rutina-ub-v1";
+const VERSION = "rutina-ub-v2";
 const FILES = ["./", "index.html", "manifest.json", "icon-192.png", "icon-512.png", "icon-180.png", "icon-maskable.png"];
 
 self.addEventListener("install", e => {
