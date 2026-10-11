@@ -125,7 +125,19 @@ body.editing header{border-bottom-color:var(--hot)}
 .rmcell{display:flex;gap:6px;align-items:flex-end}
 .rmcell label{flex:1;min-width:0}
 .newrm{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) auto;gap:8px;align-items:end;margin-top:12px}
-@media (max-width:520px){h1{font-size:24px}.eyebrow{font-size:10px}header{padding-block:10px 6px}.weeks{margin-top:8px}.weeks button{font-size:16px;padding:4px 0}.weeks button small{font-size:9px}.days button{padding:6px 9px;font-size:12px}.rmbtn{padding:7px 10px;font-size:12px}}
+.views{display:flex;gap:0;margin-top:10px;border:2px solid var(--ink);border-radius:8px;overflow:hidden}
+.views button{flex:1;font:800 15px var(--body);letter-spacing:.06em;text-transform:uppercase;padding:8px 0;border:0;background:transparent;color:var(--ink);cursor:pointer}
+.views button[aria-selected="true"]{background:var(--ink);color:var(--paper)}
+.kfreq{margin-top:14px;background:var(--accent-soft);color:var(--ink);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;font-size:14px}
+.kfreq b{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.kex{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px dashed var(--line)}
+.kex:last-child{border-bottom:0}
+.knum{font:900 20px var(--display);color:var(--muted);min-width:20px;text-align:center}
+.kdose{display:inline-block;font-size:12px;font-weight:700;padding:1px 7px;border-radius:4px;background:var(--accent-soft);color:var(--accent);white-space:nowrap;margin-left:4px}
+.knote{font-size:13px;color:var(--muted);margin-top:3px}
+.kvid{font:700 13px var(--body);text-decoration:none;padding:9px 12px;border-radius:6px;background:var(--hot);color:var(--card);white-space:nowrap}
+a.tb{text-decoration:none;display:inline-flex;align-items:center}
+@media (max-width:520px){h1{font-size:24px}.eyebrow{font-size:10px}header{padding-block:10px 6px}.weeks{margin-top:8px}.views{margin-top:8px}.views button{font-size:13px;padding:6px 0}.weeks button{font-size:16px;padding:4px 0}.weeks button small{font-size:9px}.days button{padding:6px 9px;font-size:12px}.rmbtn{padding:7px 10px;font-size:12px}}
 @media (max-width:380px){.ex{grid-template-columns:minmax(0,1fr) 92px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -136,13 +148,14 @@ body.editing header{border-bottom-color:var(--hot)}
     <div class="top">
       <div>
         <div class="eyebrow">Unión Bahía · Tombesi</div>
-        <h1>Rutina de fuerza</h1>
+        <h1 id="h1">Rutina de fuerza</h1>
       </div>
       <div class="hbtns">
         <button class="rmbtn ghost" id="edbtn" aria-pressed="false">Editar</button>
         <button class="rmbtn" id="rmbtn" aria-expanded="false" aria-controls="ajustes">Mis RM</button>
       </div>
     </div>
+    <div class="views" id="views" role="tablist" aria-label="Sección"></div>
     <div class="weeks" id="weeks"></div>
     <nav class="days" id="days"></nav>
   </header>
@@ -158,7 +171,7 @@ body.editing header{border-bottom-color:var(--hot)}
     </div>
     <div class="backup">
       <h4>Copia de seguridad</h4>
-      <p>Tus registros y tu rutina quedan guardados en este celu. Bajá una copia cada tanto, o para pasarlos a otro dispositivo.</p>
+      <p>Tus registros, tu rutina y el plan preventivo quedan guardados en este celu. Bajá una copia cada tanto, o para pasarlos a otro dispositivo.</p>
       <div class="btns">
         <button type="button" class="btn2" id="exportar">Descargar copia</button>
         <button type="button" class="btn2" id="importar">Restaurar copia</button>
@@ -335,6 +348,122 @@ function refFor(exId){
 function saveDocs(){ if(ls.set("ub-docs",docs)) setStatus("ok","Guardado en este dispositivo"); else setStatus("warn","No se pudo guardar"); }
 function saveRutina(){ if(ls.set("ub-rutina",rutina)) setStatus("ok","Rutina guardada"); else setStatus("warn","No se pudo guardar la rutina"); }
 
+
+/* ---------- plan preventivo (kine) ---------- */
+const YT = id => "https://www.youtube.com/shorts/" + id;
+const KINE_DEF = {
+  freq: "4 días por semana × 1 serie de toda la rutina, o 2 días por semana × 2 series.",
+  blocks: [
+    {b:"Movilidad de columna", sub:"", ex:[
+      {n:"Gato contento y enojado", d:"x10", nota:"", v:YT("AGDzY6HjUHQ")},
+      {n:"Rotaciones de tronco acostada", d:"x10 c/l", nota:"", v:YT("JLmeztENw_E")}]},
+    {b:"Rotación de cadera", sub:"Foco en rotación externa", ex:[
+      {n:"90-90 buscando amplitud", d:"x12", nota:"Amplitud en cada rotación, pasando por la apertura.", v:YT("AGDzY6HjUHQ")},
+      {n:"90-90 con giro de tronco y elevación de rodilla", d:"x10 c/l", nota:"El tronco gira hacia la pierna de adelante y elevo la rodilla de atrás. Después, lo mismo del otro lado.", v:YT("71UJpV0iMAA")}]},
+    {b:"Estabilidad y control", sub:"", ex:[
+      {n:"Puntas de pie, bajo explosivo a dos piernas", d:"x10", nota:"", v:YT("K8o8ngdHvsc")},
+      {n:"Puntas de pie, bajo explosivo a una pierna", d:"x6 c/l", nota:"", v:YT("rPZInSx_AcQ")},
+      {n:"Frenada anterior", d:"x8 c/l", nota:"Amortiguo flexionando cadera y rodilla de forma controlada. Sostengo la posición de frenado 2 segundos.", v:YT("qbC31LyXCNI")}]},
+    {b:"Relajación", sub:"Posturas de elongación", ex:[
+      {n:"Isquiotibiales", d:"", nota:"", v:""},
+      {n:"Aductores", d:"", nota:"Inserción distal y proximal.", v:""},
+      {n:"Gemelo y sóleo", d:"", nota:"", v:""}]},
+  ]
+};
+let kine = ls.get("ub-kine", null) || clone(KINE_DEF);
+let view = ls.get("ub-vista", "gym") === "kine" ? "kine" : "gym";
+function saveKine(){ if(ls.set("ub-kine",kine)) setStatus("ok","Plan guardado"); else setStatus("warn","No se pudo guardar el plan"); }
+const safeUrl = u => /^https?:\/\//i.test(String(u||"").trim()) ? String(u).trim() : "";
+
+function renderViews(){
+  document.getElementById("views").innerHTML = [["gym","Gym"],["kine","Preventivo"]].map(([k,t])=>
+    `<button type="button" role="tab" data-v="${k}" aria-selected="${view===k}">${t}</button>`).join("");
+  document.getElementById("weeks").hidden = view!=="gym";
+  document.getElementById("days").hidden = view!=="gym";
+}
+function renderKineView(){
+  let n=0;
+  return `
+  <div class="kfreq"><b>Frecuencia</b><span>${esc(kine.freq)}</span></div>
+  ${kine.blocks.length ? "" : `<p class="empty">El plan está vacío. Tocá <b>Editar</b> para cargarlo.</p>`}
+  ${kine.blocks.map(b=>`
+    <section class="block">
+      <div class="bhead"><h3>${esc(b.b)}</h3>${b.sub?`<span>${esc(b.sub)}</span>`:""}</div>
+      ${b.ex.map(e=>{ n++; const u=safeUrl(e.v); return `
+      <div class="kex">
+        <span class="knum">${n}</span>
+        <div style="min-width:0">
+          <div class="name">${esc(e.n)}${e.d?` <span class="kdose">${esc(e.d)}</span>`:""}</div>
+          ${e.nota?`<div class="knote">${esc(e.nota)}</div>`:""}
+        </div>
+        ${u?`<a class="kvid" href="${esc(u)}" target="_blank" rel="noopener">▶ Video</a>`:`<span class="none">—</span>`}
+      </div>`;}).join("")}
+    </section>`).join("")}`;
+}
+function renderKineEdit(){
+  const nb=kine.blocks.length;
+  return `
+  <div class="edhint">Modo edición del plan preventivo. Los cambios se guardan solos. Tocá <b>Listo</b> arriba cuando termines.</div>
+  <div class="edday"><label for="k-freq">Frecuencia<input class="in" id="k-freq" data-kf="freq" value="${esc(kine.freq)}" autocomplete="off"></label></div>
+  ${kine.blocks.map((b,bi)=>`
+    <section class="block ed">
+      <div class="edbhead">
+        <input class="in big" id="k-b${bi}" data-kb="${bi}" data-kf="b" value="${esc(b.b)}" aria-label="Nombre del bloque" autocomplete="off">
+        <input class="in small" id="k-s${bi}" data-kb="${bi}" data-kf="sub" value="${esc(b.sub)}" placeholder="Nota del bloque (opcional)" aria-label="Nota del bloque" autocomplete="off">
+        <div class="tools">
+          <button type="button" class="tb" data-act="kbup" data-b="${bi}" ${bi===0?"disabled":""} aria-label="Subir bloque">↑</button>
+          <button type="button" class="tb" data-act="kbdown" data-b="${bi}" ${bi===nb-1?"disabled":""} aria-label="Bajar bloque">↓</button>
+          <button type="button" class="tb del" data-act="kbdel" data-b="${bi}">Borrar bloque</button>
+        </div>
+      </div>
+      ${b.ex.map((e,ei)=>{ const id=`${bi}-${ei}`, A=`data-kb="${bi}" data-ke="${ei}"`, B=`data-b="${bi}" data-e="${ei}"`; return `
+      <div class="edex">
+        <label for="k-n${id}">Ejercicio<input class="in name" id="k-n${id}" ${A} data-kf="n" value="${esc(e.n)}" autocomplete="off"></label>
+        <div class="edrow">
+          <label for="k-d${id}">Repeticiones / series<input class="in" id="k-d${id}" ${A} data-kf="d" value="${esc(e.d)}" placeholder="x10 c/l" autocomplete="off"></label>
+          <label for="k-v${id}">Link del video<input class="in" id="k-v${id}" ${A} data-kf="v" type="url" inputmode="url" value="${esc(e.v)}" placeholder="https://…" autocomplete="off"></label>
+        </div>
+        <label for="k-o${id}">Indicación<input class="in" id="k-o${id}" ${A} data-kf="nota" value="${esc(e.nota)}" placeholder="opcional" autocomplete="off"></label>
+        <div class="tools">
+          ${safeUrl(e.v)?`<a class="tb" href="${esc(safeUrl(e.v))}" target="_blank" rel="noopener">Probar link</a>`:""}
+          <button type="button" class="tb" data-act="keup" ${B} ${ei===0?"disabled":""} aria-label="Subir ejercicio">↑</button>
+          <button type="button" class="tb" data-act="kedown" ${B} ${ei===b.ex.length-1?"disabled":""} aria-label="Bajar ejercicio">↓</button>
+          <button type="button" class="tb del" data-act="kedel" ${B}>Borrar</button>
+        </div>
+      </div>`;}).join("")}
+      <button type="button" class="add" data-act="keadd" data-b="${bi}">+ Agregar ejercicio</button>
+    </section>`).join("")}
+  <button type="button" class="add big" data-act="kbadd">+ Agregar bloque</button>
+  <div class="edfoot"><button type="button" class="tb del" data-act="kreset">Volver al plan original de la kine</button></div>`;
+}
+function kineAct(btn){
+  const a=btn.dataset.act, bi=+btn.dataset.b, ei=+btn.dataset.e, b=kine.blocks[bi];
+  switch(a){
+    case "kbup": swap(kine.blocks,bi,bi-1); break;
+    case "kbdown": swap(kine.blocks,bi,bi+1); break;
+    case "kbdel": if(!confirm(`¿Borrar el bloque "${b.b}"?`)) return; kine.blocks.splice(bi,1); break;
+    case "kbadd": kine.blocks.push({b:"Bloque nuevo", sub:"", ex:[]}); saveKine(); renderMain(); focusLater(`k-b${kine.blocks.length-1}`); return;
+    case "keup": swap(b.ex,ei,ei-1); break;
+    case "kedown": swap(b.ex,ei,ei+1); break;
+    case "kedel": if(!confirm(`¿Borrar "${b.ex[ei].n}"?`)) return; b.ex.splice(ei,1); break;
+    case "keadd": b.ex.push({n:"Nuevo ejercicio", d:"", nota:"", v:""}); saveKine(); renderMain(); focusLater(`k-n${bi}-${b.ex.length-1}`); return;
+    case "kreset": if(!confirm("¿Volver al plan original de la kine? Se pierden los cambios que le hiciste.")) return; kine=clone(KINE_DEF); break;
+    default: return;
+  }
+  saveKine(); renderMain();
+}
+function kineField(t){
+  const f=t.dataset.kf, v=t.value.trim();
+  if(f==="freq"){ kine.freq=v; saveKine(); return; }
+  const b=kine.blocks[+t.dataset.kb]; if(!b) return;
+  if(f==="b"){ b.b=v||"Bloque"; saveKine(); return; }
+  if(f==="sub"){ b.sub=v; saveKine(); return; }
+  const e=b.ex[+t.dataset.ke]; if(!e) return;
+  if(f==="n") e.n=v||"Ejercicio";
+    else e[f]=v;
+  saveKine();
+}
+
 /* ---------- render ---------- */
 function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
 function weekLabel(w){
@@ -343,6 +472,8 @@ function weekLabel(w){
   return "";
 }
 function renderNav(){
+  renderViews();
+  document.getElementById("h1").textContent = view==="kine" ? "Plan preventivo" : "Rutina de fuerza";
   document.getElementById("weeks").innerHTML=[1,2,3].map(w=>{
     const l=weekLabel(w);
     return `<button type="button" data-w="${w}" aria-pressed="${w===week}">Semana ${w}${l?`<small>${esc(l)}</small>`:""}</button>`;
@@ -353,7 +484,7 @@ function renderNav(){
   document.getElementById("edbtn").setAttribute("aria-pressed",editing);
   document.getElementById("edbtn").textContent = editing ? "Listo" : "Editar";
   document.body.classList.toggle("editing",editing);
-  document.getElementById("foot").hidden = editing;
+  document.getElementById("foot").hidden = editing || view==="kine";
 }
 function renderAjustes(){
   const pc = pcOf();
@@ -447,7 +578,7 @@ function renderEdit(d){
 }
 function renderMain(){
   const d=curDay();
-  document.getElementById("main").innerHTML = d ? (editing ? renderEdit(d) : renderView(d)) : "";
+  document.getElementById("main").innerHTML = view==="kine" ? (editing ? renderKineEdit() : renderKineView()) : (d ? (editing ? renderEdit(d) : renderView(d)) : "");
 }
 function renderAll(){ renderNav(); renderMain(); renderAjustes(); }
 function setStatus(cls,txt){const s=document.getElementById("status");s.className="status "+cls;s.querySelector("span").textContent=txt;}
@@ -514,7 +645,9 @@ function editField(t){
 /* ---------- eventos ---------- */
 document.addEventListener("click",ev=>{
   const w=ev.target.closest("[data-w]"), d=ev.target.closest("[data-d]"), o=ev.target.closest("[data-open]"), a=ev.target.closest("[data-act]");
-  if(a){ act(a); return; }
+  if(a){ if(a.dataset.act.startsWith("k")) kineAct(a); else act(a); return; }
+  const v=ev.target.closest("[data-v]");
+  if(v){ view=v.dataset.v; ls.set("ub-vista",view); renderNav(); renderMain(); window.scrollTo({top:0}); return; }
   if(w){week=+w.dataset.w; ls.set("ub-semana",week); renderNav(); renderMain();}
   if(d){day=d.dataset.d; ls.set("ub-dia",day); renderNav(); renderMain(); window.scrollTo({top:0});}
   if(ev.target.id==="edbtn"){ editing=!editing; document.getElementById("ajustes").hidden=true; document.getElementById("rmbtn").setAttribute("aria-expanded",false); renderNav(); renderMain(); window.scrollTo({top:0}); }
@@ -528,6 +661,7 @@ document.addEventListener("click",ev=>{
 document.addEventListener("keydown",ev=>{ if(ev.key==="Enter" && ev.target.tagName==="INPUT") ev.target.blur(); });
 document.addEventListener("change",ev=>{
   const t=ev.target;
+  if(t.dataset.kf){ kineField(t); return; }
   if(t.dataset.f){ editField(t); return; }
   if(t.id==="newrm-n"||t.id==="newrm-v"||t.id==="archivo") return;
   const n=parse(t.value);
@@ -549,7 +683,7 @@ document.addEventListener("focusout",()=>setTimeout(()=>{ if(!editing && documen
 
 /* ---------- copia de seguridad ---------- */
 document.getElementById("exportar").addEventListener("click",()=>{
-  const blob=new Blob([JSON.stringify({app:"rutina-ub",fecha:new Date().toISOString(),docs,rutina},null,1)],{type:"application/json"});
+  const blob=new Blob([JSON.stringify({app:"rutina-ub",fecha:new Date().toISOString(),docs,rutina,kine},null,1)],{type:"application/json"});
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
   a.download="rutina-ub-"+new Date().toISOString().slice(0,10)+".json";
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
@@ -562,6 +696,7 @@ document.getElementById("archivo").addEventListener("change",ev=>{
     const j=JSON.parse(t); if(!j||j.app!=="rutina-ub"||typeof j.docs!=="object") throw 0;
     docs=j.docs; ls.set("ub-docs",docs);
     if(j.rutina && Array.isArray(j.rutina.days)){ rutina=j.rutina; ls.set("ub-rutina",rutina); fixDay(); }
+    if(j.kine && Array.isArray(j.kine.blocks)){ kine=j.kine; ls.set("ub-kine",kine); }
     renderAll();
     document.getElementById("bkmsg").textContent="Copia restaurada.";
   }).catch(()=>{ document.getElementById("bkmsg").textContent="Ese archivo no es una copia de esta app."; });
