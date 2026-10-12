@@ -193,82 +193,88 @@ const DEF_RMS = [
   {k:"cadera",     n:"Elevación de cadera", def:160},
   {k:"sentadilla", n:"Sentadilla", def:null},
   {k:"envion",     n:"Envión – 2do tiempo", def:null},
+  {k:"banco",      n:"Banco plano c/barra", def:null},
+  {k:"despegue",   n:"Despegue c/barra hex", def:null},
 ];
 const s3 = r => ["3 × "+r,"4 × "+r,"5 × "+r];
 const PCT = [70,75,80];
 const PX  = ["3 × 5","3 × 3","3 × 1"];
 
+const N = r => ["","",r]; // ejercicio nuevo de la semana 3
 const DAYS = [
  {k:"lun", t:"Lun", blocks:[
-  {b:"Activación", ex:[{id:"landmine", n:"2dos tiempos landmine", rx:"3 × 4/4", log:"kg"}]},
-  {b:"Envión", ex:[{id:"2t", n:"2do tiempo", rx:PX, pct:PCT, rm:"envion", log:"kg"}]},
+  {b:"Activación", ex:[
+    {id:"2tbarra", n:"2dos tiempos c/barra", rx:N("3 × 2/2"), log:"kg"}]},
   {b:"C1", ex:[
     {id:"sentadilla", n:"Sentadilla", rx:PX, pct:PCT, rm:"sentadilla", log:"kg"},
     {id:"press", n:"Press de hombros", rx:PX, pct:PCT, rm:"press", log:"kg"}]},
   {b:"C2", sub:"Contraste", ex:[
-    {id:"saltoscarga", n:"Saltos con carga", rx:["3 × 2","3 × 3","3 × 4"], pc:30, log:"kg"},
-    {id:"abk", n:"Máx / ABK al cajón", rx:"3 × 3"},
-    {id:"vallas", n:"Salto a vallas", rx:"3 × 3"}]},
+    {id:"saltoscarga", n:"Saltos con carga", rx:["3 × 2","3 × 3","3 × 3"], pc:20, log:"kg"},
+    {id:"saltoasist", n:"Saltos asistidos", rx:N("3 × 8")}]},
   {b:"C3", ex:[
-    {id:"nordico", n:"Curl nórdico", rx:["3 × 3","3 × 4","3 × 5"]},
+    {id:"nordico", n:"Curl nórdico", rx:["3 × 3","3 × 4","3 × 3"]},
     {id:"remo3", n:"Remo 3 apoyos", rx:["3 × 12-12-10 · RIR 2","3 × 10-10-10 · RIR 2","3 × 10-10-8 · RIR 2"], log:"kg"}]},
   {b:"C4", ex:[
-    {id:"menton", n:"Remo al mentón", rx:"3-6 × 10", log:"kg"},
-    {id:"triceps", n:"Tríceps", rx:"3-6 × 10", log:"kg"},
-    {id:"grip", n:"Hand grip", rx:"75% PC", pc:75, log:"kg"}]},
+    {id:"estocada", n:"Estocada c/banda interna", rx:N("3 × 6/6 · RIR 4"), log:"kg"},
+    {id:"pullapartl", n:"Pull apart", tag:"hombros", rx:N("3-6 × 10-12"), log:"kg"},
+    {id:"triceps", n:"Tríceps", rx:["3-6 × 10","3-6 × 10","3-6 × 10-12 · RIR 2"], log:"kg"}]},
+  {b:"SNPS", ex:[
+    {id:"snpsisquio", n:"Postura isquiotibiales", rx:N("3 minutos")}]},
  ]},
  {k:"mar", t:"Mar", blocks:[
-  {b:"Activación", ex:[
-    {id:"tiron", n:"Tirón medio muslo", rx:['3 × 3"','3 × 4"','3 × 5"']},
-    {id:"rotbal", n:"Rotación balística", rx:"3 × 4/4", log:"kg"},
-    {id:"flexreac", n:"Flexiones reactivas", rx:"3 × 3"}]},
   {b:"C1", ex:[
     {id:"remobarra", n:"Remo c/barra", rx:PX, pct:PCT, rm:"remo", log:"kg"},
-    {id:"cadera", n:"Elevación de cadera", rx:PX, pct:PCT, rm:"cadera", log:"kg"}]},
-  {b:"C2", sub:"Unipodal: elegí uno", ex:[
+    {id:"cadera", n:"Elevación de cadera", rx:PX, pct:PCT, rm:"cadera", log:"kg"},
+    {id:"domjalon", n:"Dominadas + jalón/remo", rx:N("3 × máx dominadas · descanso 30\" + remo/jalón 3 × 10 · RIR 3"), log:"reps"}]},
+  {b:"C1", sub:"Lanzamientos", ex:[
+    {id:"lanzsobre", n:"Lanzamiento sobre cabeza", rx:N("3 × 3"), log:"kg"},
+    {id:"lanzhoriz", n:"Lanzamiento horizontal", rx:N("3 × 3"), log:"kg"}]},
+  {b:"C2", sub:"Contraste", ex:[
     {id:"pressz", n:"Press Z", rx:["3 × 12-12-10 · RIR 2","3 × 10-10-10 · RIR 2","3 × 10-10-8 · RIR 2"], log:"kg"},
-    {id:"sarranque", n:"Sentadilla de arranque", tag:"unipodal", rx:"3 × 6-8 · RIR 3", log:"kg"},
-    {id:"bajcajon", n:"Bajada a cajón", tag:"unipodal", rx:"3 × 6-8 · RIR 3", log:"kg"},
-    {id:"pistola", n:"Sentadilla pistola", tag:"unipodal", rx:"3 × 6-8 · RIR 3", log:"kg"}]},
+    {id:"subcajon", n:"Subida a cajón reactiva", rx:N("3 × 6/6 · RIR 3"), log:"kg"}]},
   {b:"C3", ex:[
-    {id:"biceps", n:"Bíceps", rx:"3-6 × 10", log:"kg"},
-    {id:"hposterior", n:"Hombro posterior", rx:"3-6 × 10", log:"kg"}]},
+    {id:"biceps", n:"Bíceps", rx:["3-6 × 10","3-6 × 10","3-4 × 10-12 · RIR 2"], log:"kg"},
+    {id:"hposterior", n:"Hombro posterior", rx:["3-6 × 10","3-6 × 10","3-4 × 10-12 · RIR 2"], log:"kg"}]},
+  {b:"SNPS", ex:[
+    {id:"snpscuad", n:"Postura cuádriceps", rx:N("3 minutos")}]},
  ]},
  {k:"mie", t:"Mié", blocks:[
   {b:"C1", ex:[
-    {id:"bulgaras", n:"Búlgaras", rx:s3("6/6 · RIR 3"), log:"kg"},
-    {id:"renegado", n:"Remo renegado", rx:s3("6/6 · RIR 3"), log:"kg"}]},
-  {b:"C2", ex:[
-    {id:"dominada", n:"Dominada / semi-asistida", rx:s3("máx"), log:"reps"},
-    {id:"sumo", n:"Peso muerto sumo", rx:s3("6-8 · RIR 2"), log:"kg"}]},
-  {b:"C3", ex:[
-    {id:"sliders", n:"Curl de isquio c/sliders 2P", rx:s3("6")},
-    {id:"aperturas", n:"Aperturas en inclinado", rx:s3("8 · RIR 3"), log:"kg"}]},
+    {id:"isotiron", n:"ISO push tirón medio muslo", rx:N('3 × 5"')},
+    {id:"isobancom", n:"ISO push banco plano", rx:N('3 × 5"')},
+    {id:"isomilitar", n:"ISO push press militar", rx:N('3 × 5"')},
+    {id:"isogem", n:"ISO push gemelos", rx:N('3 × 5"')}]},
+  {b:"C2", sub:"Elegí 1 opción", ex:[
+    {id:"arranque1b", n:"Arranque 1B", rx:N("3 × 4/4 · RPE 7-8"), log:"kg"},
+    {id:"arranqueparado", n:"Arranque parado", rx:N("3 × 3 · RPE 7-8"), log:"kg"}]},
+  {b:"C3", sub:"Elegí 1 opción", ex:[
+    {id:"tirones", n:"Tirones", rx:N("3 × 3 · RPE 7-8"), log:"kg"},
+    {id:"cargadaparado", n:"Cargada parado", rx:N("3 × 3 · RPE 7-8"), log:"kg"}]},
   {b:"C4", ex:[
-    {id:"biceps", n:"Bíceps", rx:"15-12-10", log:"kg"},
-    {id:"vuelos", n:"Vuelos", rx:"15-12-10", log:"kg"},
-    {id:"triceps", n:"Tríceps", rx:"15-12-10", log:"kg"}]},
+    {id:"rotpared", n:"Rotacional a pared", rx:N("3 × 4/4"), log:"kg"},
+    {id:"vuelos", n:"Vuelos", rx:["15-12-10","15-12-10","3 × 4/4"], log:"kg"}]},
+  {b:"SNPS", ex:[
+    {id:"snpsgluteo", n:"Postura glúteo", rx:N("3 minutos")}]},
  ]},
  {k:"jue", t:"Jue", blocks:[
-  {b:"Activación", ex:[
+  {b:"Activación", sub:"No citadas", ex:[
     {id:"isobanco", n:"ISO push banco plano", rx:['3 × 3"','3 × 4"','3 × 5"']},
     {id:"lanzmb", n:"Lanzamiento horizontal c/MB", rx:"3 × 5", log:"kg"},
     {id:"isocatch", n:"ISO catch elevación cadera 1P", rx:["3 × 2/2","3 × 3/3","3 × 3/3"]}]},
   {b:"C1", ex:[
-    {id:"remobarra", n:"Remo c/barra", rx:PX, pct:PCT, rm:"remo", log:"kg"},
-    {id:"cadera", n:"Elevación de cadera", rx:PX, pct:PCT, rm:"cadera", log:"kg"}]},
+    {id:"bancobarra", n:"Banco plano c/barra", rx:N("3 × 4"), pct:[null,null,80], rm:"banco", log:"kg"},
+    {id:"despegue", n:"Despegue c/barra hex", rx:N("3 × 4"), pct:[null,null,80], rm:"despegue", log:"kg"}]},
   {b:"C2", ex:[
     {id:"multidir", n:"Salto multidireccional", rx:"3 × 1 pasada"},
     {id:"prisioneros", n:"Prisioneros", rx:"3 × 4"},
     {id:"dropjump", n:"Drop jump CT 1 pie", tag:"opcional", rx:"3 × 3/3"},
     {id:"catchflex", n:"ISO catch flexiones + salto", tag:"opcional", rx:"3 × 3-5"}]},
   {b:"C3", ex:[
-    {id:"invertido", n:"Remo invertido", rx:"3 × 6 · ajustá ángulo y peso", log:"kg"},
+    {id:"invertido", n:"Remo invertido", rx:["3 × 6 · ajustá ángulo y peso","3 × 6 · ajustá ángulo y peso","3 × 6"], log:"kg"},
     {id:"copenhague", n:"Plancha Copenhague", rx:'3 × 20" c/l'}]},
   {b:"C4", sub:"Orden fijo", ex:[
     {id:"vfrontales", n:"Vuelos frontales", rx:["3 × 8 · RIR 2","3 × 10 · RIR 2","3 × 12 · RIR 2"], log:"kg"},
     {id:"bancomanc", n:"Banco plano c/mancuernas", rx:["3 × 8 · RIR 2","3 × 10 · RIR 2","3 × 12 · RIR 2"], log:"kg"},
-    {id:"fondos", n:"Fondos", rx:["3 × 8 · RIR 2","3 × 10 · RIR 2","3 × 12 · RIR 2"], log:"kg"},
     {id:"tricpolea", n:"Tríceps polea", rx:["3 × 8 · RIR 2","3 × 10 · RIR 2","3 × 12 · RIR 2"], log:"kg"},
     {id:"remopolea", n:"Remo polea", rx:["3 × 8 · RIR 2","3 × 10 · RIR 2","3 × 12 · RIR 2"], log:"kg"}]},
  ]},
@@ -319,13 +325,22 @@ function norm(days){
     rm:e.rm||"", pc:e.pc ?? null, log:e.log||""
   }))}))}));
 }
-const defaultRutina = () => ({v:1, rms:clone(DEF_RMS), days:norm(DAYS)});
-let rutina = ls.get("ub-rutina", null) || defaultRutina();
+const RUT_VER = 2; // subir cuando el club manda una planificación nueva
+const defaultRutina = () => ({v:RUT_VER, rms:clone(DEF_RMS), days:norm(DAYS)});
+let rutina = ls.get("ub-rutina", null);
+let rutinaNueva = false;
+if(!rutina || rutina.v !== RUT_VER){
+  const extra = (rutina?.rms||[]).filter(r=>!DEF_RMS.some(d=>d.k===r.k));
+  rutinaNueva = !!rutina;
+  rutina = defaultRutina(); rutina.rms.push(...extra);
+  ls.set("ub-rutina", rutina);
+}
 let docs = ls.get("ub-docs", {});
 let editing = false;
 const BLOCK_ID = "b1";
 const wd = new Date().getDay();
 let week = ls.get("ub-semana", 1);
+if(rutinaNueva || ls.get("ub-rut-ver",0)!==RUT_VER){ week = 3; ls.set("ub-semana",3); ls.set("ub-rut-ver",RUT_VER); }
 let day = ({1:"lun",2:"mar",3:"mie",4:"jue"})[wd] || ls.get("ub-dia", null) || "g1";
 function fixDay(){ if(!rutina.days.some(d=>d.k===day)) day = rutina.days[0]?.k; }
 fixDay();
