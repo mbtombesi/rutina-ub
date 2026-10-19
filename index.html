@@ -247,7 +247,7 @@ const DAYS = [
     {id:"menton", n:"Remo al mentón", rx:["3-6 × 10 · RIR 2","3-6 × 10 · RIR 2",""], wk:O, log:"kg"},
     {id:"pullapartl", n:"Pull apart", tag:"hombros", rx:N("3-6 × 10-12"), wk:S3, log:"kg"},
     {id:"triceps", n:"Tríceps", rx:["3-6 × 10 · RIR 2","3-6 × 10 · RIR 2","3-6 × 10-12 · RIR 2"], log:"kg"},
-    {id:"grip", n:"Hand grip", rx:["1 × máx tiempo","1 × máx tiempo",""], pc:[75,75,null], wk:O, log:"kg"}]},
+    {id:"grip", n:"Hand grip", rx:["1 × máx tiempo","1 × máx tiempo",""], pc:[75,75,null], wk:O, log:"seg"}]},
   {b:"SNPS", ex:[
     {id:"snpsisquio", n:"Postura isquiotibiales", rx:N("3 minutos"), wk:S3}]},
  ]},
@@ -427,6 +427,55 @@ const COMP_DAYS = [
   if(seeded.includes("comp1")) return;
   if(!store.list.some(r=>r.id==="comp1")) store.list.push({id:"comp1", name:"Compensatorio resistencia", weeks:4, days:norm(COMP_DAYS,4)});
   seeded.push("comp1"); ls.set("ub-seeded", seeded); ls.set("ub-rutinas", store);
+})();
+
+/* trabajo diferenciado del domingo 18/10 (post doble partido) */
+const DIF_DAYS = [
+ {k:"d1", t:"Dom 18/10", blocks:[
+  {b:"Bloque 1", sub:"Excéntricos", ex:[
+    {id:"pressexclm", n:"Press excéntrico en landmine", rx:"2 × 2 c/l", log:"kg"},
+    {id:"domexc", n:"Dominadas excéntricas", rx:"2 × 2"},
+    {id:"isqexc", n:"Isquios excéntricos c/slider", rx:"2 × 2"},
+    {id:"copdin", n:"Plancha Copenhague dinámica", rx:"x6 c/l", log:"kg"}]},
+  {b:"Bloque 2", ex:[
+    {id:"remobarra", n:"Remo c/barra", rx:"3 × 5", pct:75, rm:"remo", log:"kg"},
+    {id:"pressmil", n:"Press militar", rx:"3 × 5", pct:75, rm:"press", log:"kg"}]},
+  {b:"Bloque 3", ex:[
+    {id:"hipthrust1p", n:"Hip thrust 1 pierna c/barra", rx:"3 × 6/6", log:"kg"},
+    {id:"vlaterales", n:"Vuelos laterales", rx:"12-12-10", log:"kg"},
+    {id:"cruce", n:"Cruce de polea", rx:"12-12-10", log:"kg"}]},
+  {b:"Finalizador brazos", sub:"Primero bíceps, después tríceps", ex:[
+    {id:"bicepsw", n:"Bíceps c/barra W", tag:"barra W + 5 kg c/lado", rx:'1 × máx reps + 5 × (15" pausa + 3-5 reps)', log:"reps"},
+    {id:"tricfrances", n:"Tríceps francés c/disco 15 kg", rx:'1 × máx reps + 5 × (15" pausa + 3-5 reps)', log:"reps"}]},
+ ]},
+];
+(function seedDif(){
+  const seeded = ls.get("ub-seeded", []);
+  if(seeded.includes("dif1810")) return;
+  if(!store.list.some(r=>r.id==="dif1810")) store.list.push({id:"dif1810", name:"Diferenciado 18/10", weeks:1, days:norm(DIF_DAYS,1)});
+  // pesos que contaste: Copenhague 7,5 kg · hip thrust 40 kg en total (barra + 10 kg c/lado)
+  const k="dif1810-w1-d1", d=JSON.parse(JSON.stringify(ls.get("ub-docs",{})));
+  d[k]=d[k]||{v:{}}; d[k].v=d[k].v||{};
+  if(d[k].v.copdin==null) d[k].v.copdin=7.5;
+  if(d[k].v.hipthrust1p==null) d[k].v.hipthrust1p=40;
+  ls.set("ub-docs", d);
+  seeded.push("dif1810"); ls.set("ub-seeded", seeded); ls.set("ub-rutinas", store);
+})();
+/* ajustes que confirmaste: jueves S1-S2 eran banco y despegue; hand grip en segundos */
+(function fixJueGrip(){
+  if(ls.get("ub-fix-1910", false)) return;
+  const d=JSON.parse(JSON.stringify(ls.get("ub-docs",{})));
+  [1,2].forEach(w=>{
+    const v=d[`b1-w${w}-jue`]?.v; if(!v) return;
+    [["remobarra","bancobarra"],["cadera","despegue"]].forEach(([from,to])=>{
+      if(v[from]!=null && v[to]==null){ v[to]=v[from]; delete v[from]; }
+    });
+  });
+  ls.set("ub-docs", d);
+  const r1=store.list.find(r=>r.id==="b1");
+  r1?.days.forEach(dd=>dd.blocks.forEach(b=>b.ex.forEach(e=>{ if(e.id==="grip"){ e.log="seg"; e.rx=Wn(["1 × máx tiempo","1 × máx tiempo",""],r1.weeks).map(x=>x||""); } })));
+  ls.set("ub-rutinas", store);
+  ls.set("ub-fix-1910", true);
 })();
 const getRut = id => store.list.find(r=>r.id===id);
 let rutina = getRut(store.active) || store.list[0];
