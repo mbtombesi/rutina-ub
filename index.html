@@ -152,6 +152,9 @@ a.tb{text-decoration:none;display:inline-flex;align-items:center}
 .newrut legend{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
 .newrut label.radio{flex-direction:row;align-items:center;gap:8px;font-size:15px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--ink)}
 .newrut .btns{display:flex;gap:8px;flex-wrap:wrap}
+.wkset{border:0;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
+.wkset legend{float:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-right:6px}
+.wkchk{display:inline-flex;align-items:center;gap:5px;font-size:14px;font-weight:600}
 @media (max-width:520px){h1{font-size:24px}.eyebrow{font-size:10px}header{padding-block:10px 6px}.weeks{margin-top:8px}.views{margin-top:8px}.views button{font-size:13px;padding:6px 0}.weeks button{font-size:16px;padding:4px 0}.weeks button small{font-size:9px}.days button{padding:6px 9px;font-size:12px}.rmbtn{padding:7px 10px;font-size:12px}}
 @media (max-width:380px){.ex{grid-template-columns:minmax(0,1fr) 92px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -213,77 +216,101 @@ const DEF_RMS = [
   {k:"cadera",     n:"Elevación de cadera", def:160},
   {k:"sentadilla", n:"Sentadilla", def:null},
   {k:"envion",     n:"Envión – 2do tiempo", def:null},
-  {k:"banco",      n:"Banco plano c/barra", def:null},
-  {k:"despegue",   n:"Despegue c/barra hex", def:null},
+  {k:"banco",      n:"Banco plano c/barra", def:55},
+  {k:"despegue",   n:"Despegue c/barra hex", def:140},
 ];
 const s3 = r => ["3 × "+r,"4 × "+r,"5 × "+r];
 const PCT = [70,75,80];
 const PX  = ["3 × 5","3 × 3","3 × 1"];
 
 const N = r => ["","",r]; // ejercicio nuevo de la semana 3
+const O=[1,1,0], S3=[0,0,1], X=[0,0,0]; // en qué semanas se hace (X = Bahiense del Norte, oculto)
 const DAYS = [
  {k:"lun", t:"Lun", blocks:[
   {b:"Activación", ex:[
-    {id:"2tbarra", n:"2dos tiempos c/barra", rx:N("3 × 2/2"), log:"kg"}]},
+    {id:"landmine", n:"2dos tiempos landmine", rx:["3 × 4/4","3 × 4/4",""], wk:O, log:"kg"},
+    {id:"2tbarra", n:"2dos tiempos c/barra", rx:N("3 × 2/2"), wk:S3, log:"kg"}]},
+  {b:"Envión", sub:"Bahiense del Norte", ex:[
+    {id:"2t", n:"Envión / 2do tiempo", rx:["3 × 5","3 × 3",""], pct:[70,75,null], rm:"envion", wk:X, log:"kg"}]},
   {b:"C1", ex:[
     {id:"sentadilla", n:"Sentadilla", rx:PX, pct:PCT, rm:"sentadilla", log:"kg"},
     {id:"press", n:"Press de hombros", rx:PX, pct:PCT, rm:"press", log:"kg"}]},
   {b:"C2", sub:"Contraste", ex:[
-    {id:"saltoscarga", n:"Saltos con carga", rx:["3 × 2","3 × 3","3 × 3"], pc:20, log:"kg"},
-    {id:"saltoasist", n:"Saltos asistidos", rx:N("3 × 8")}]},
+    {id:"saltoscarga", n:"Saltos con carga", rx:["3 × 2","3 × 3","3 × 3"], pc:[30,30,20], log:"kg"},
+    {id:"vallas", n:"Salto a vallas", rx:["3 × 3","3 × 3",""], wk:O},
+    {id:"saltoasist", n:"Saltos asistidos", rx:N("3 × 8"), wk:S3}]},
   {b:"C3", ex:[
     {id:"nordico", n:"Curl nórdico", rx:["3 × 3","3 × 4","3 × 3"]},
     {id:"remo3", n:"Remo 3 apoyos", rx:["3 × 12-12-10 · RIR 2","3 × 10-10-10 · RIR 2","3 × 10-10-8 · RIR 2"], log:"kg"}]},
   {b:"C4", ex:[
-    {id:"estocada", n:"Estocada c/banda interna", rx:N("3 × 6/6 · RIR 4"), log:"kg"},
-    {id:"pullapartl", n:"Pull apart", tag:"hombros", rx:N("3-6 × 10-12"), log:"kg"},
-    {id:"triceps", n:"Tríceps", rx:["3-6 × 10","3-6 × 10","3-6 × 10-12 · RIR 2"], log:"kg"}]},
+    {id:"estocada", n:"Estocada c/banda interna", rx:N("3 × 6/6 · RIR 4"), wk:S3, log:"kg"},
+    {id:"menton", n:"Remo al mentón", rx:["3-6 × 10 · RIR 2","3-6 × 10 · RIR 2",""], wk:O, log:"kg"},
+    {id:"pullapartl", n:"Pull apart", tag:"hombros", rx:N("3-6 × 10-12"), wk:S3, log:"kg"},
+    {id:"triceps", n:"Tríceps", rx:["3-6 × 10 · RIR 2","3-6 × 10 · RIR 2","3-6 × 10-12 · RIR 2"], log:"kg"},
+    {id:"grip", n:"Hand grip", rx:["1 × máx tiempo","1 × máx tiempo",""], pc:[75,75,null], wk:O, log:"kg"}]},
   {b:"SNPS", ex:[
-    {id:"snpsisquio", n:"Postura isquiotibiales", rx:N("3 minutos")}]},
+    {id:"snpsisquio", n:"Postura isquiotibiales", rx:N("3 minutos"), wk:S3}]},
  ]},
  {k:"mar", t:"Mar", blocks:[
+  {b:"Activación", ex:[
+    {id:"tiron", n:"Tirón medio muslo", rx:['3 × 3"','3 × 4"',""], wk:O},
+    {id:"rotbal", n:"Rotación balística", rx:["3 × 4/4","3 × 4/4",""], wk:O, log:"kg"},
+    {id:"flexreac", n:"Flexiones reactivas", rx:["3 × 3","3 × 3",""], wk:O}]},
   {b:"C1", ex:[
     {id:"remobarra", n:"Remo c/barra", rx:PX, pct:PCT, rm:"remo", log:"kg"},
     {id:"cadera", n:"Elevación de cadera", rx:PX, pct:PCT, rm:"cadera", log:"kg"},
-    {id:"domjalon", n:"Dominadas + jalón/remo", rx:N("3 × máx dominadas · descanso 30\" + remo/jalón 3 × 10 · RIR 3"), log:"reps"}]},
+    {id:"domjalon", n:"Dominadas + jalón/remo", rx:N("3 × máx dominadas · descanso 30\" + remo/jalón 3 × 10 · RIR 3"), wk:S3, log:"reps"}]},
   {b:"C1", sub:"Lanzamientos", ex:[
-    {id:"lanzsobre", n:"Lanzamiento sobre cabeza", rx:N("3 × 3"), log:"kg"},
-    {id:"lanzhoriz", n:"Lanzamiento horizontal", rx:N("3 × 3"), log:"kg"}]},
-  {b:"C2", sub:"Contraste", ex:[
+    {id:"lanzsobre", n:"Lanzamiento sobre cabeza", rx:N("3 × 3"), wk:S3, log:"kg"},
+    {id:"lanzhoriz", n:"Lanzamiento horizontal", rx:N("3 × 3"), wk:S3, log:"kg"}]},
+  {b:"C2", ex:[
     {id:"pressz", n:"Press Z", rx:["3 × 12-12-10 · RIR 2","3 × 10-10-10 · RIR 2","3 × 10-10-8 · RIR 2"], log:"kg"},
-    {id:"subcajon", n:"Subida a cajón reactiva", rx:N("3 × 6/6 · RIR 3"), log:"kg"}]},
+    {id:"sarranque", n:"Sentadilla de arranque", tag:"elegí 1 unipodal", rx:["3 × 6-8 · RIR 3","3 × 6-8 · RIR 3",""], wk:O, log:"kg"},
+    {id:"bajcajon", n:"Bajada a cajón", tag:"elegí 1 unipodal", rx:["3 × 6-8 · RIR 3","3 × 6-8 · RIR 3",""], wk:O, log:"kg"},
+    {id:"pistola", n:"Sentadilla pistola", tag:"elegí 1 unipodal", rx:["3 × 6-8 · RIR 3","3 × 6-8 · RIR 3",""], wk:O, log:"kg"},
+    {id:"subcajon", n:"Subida a cajón reactiva", tag:"contraste", rx:N("3 × 6/6 · RIR 3"), wk:S3, log:"kg"}]},
   {b:"C3", ex:[
     {id:"biceps", n:"Bíceps", rx:["3-6 × 10","3-6 × 10","3-4 × 10-12 · RIR 2"], log:"kg"},
     {id:"hposterior", n:"Hombro posterior", rx:["3-6 × 10","3-6 × 10","3-4 × 10-12 · RIR 2"], log:"kg"}]},
   {b:"SNPS", ex:[
-    {id:"snpscuad", n:"Postura cuádriceps", rx:N("3 minutos")}]},
+    {id:"snpscuad", n:"Postura cuádriceps", rx:N("3 minutos"), wk:S3}]},
  ]},
  {k:"mie", t:"Mié", blocks:[
   {b:"C1", ex:[
-    {id:"isotiron", n:"ISO push tirón medio muslo", rx:N('3 × 5"')},
-    {id:"isobancom", n:"ISO push banco plano", rx:N('3 × 5"')},
-    {id:"isomilitar", n:"ISO push press militar", rx:N('3 × 5"')},
-    {id:"isogem", n:"ISO push gemelos", rx:N('3 × 5"')}]},
-  {b:"C2", sub:"Elegí 1 opción", ex:[
-    {id:"arranque1b", n:"Arranque 1B", rx:N("3 × 4/4 · RPE 7-8"), log:"kg"},
-    {id:"arranqueparado", n:"Arranque parado", rx:N("3 × 3 · RPE 7-8"), log:"kg"}]},
-  {b:"C3", sub:"Elegí 1 opción", ex:[
-    {id:"tirones", n:"Tirones", rx:N("3 × 3 · RPE 7-8"), log:"kg"},
-    {id:"cargadaparado", n:"Cargada parado", rx:N("3 × 3 · RPE 7-8"), log:"kg"}]},
+    {id:"bulgaras", n:"Búlgaras", rx:["3 × 6/6 · RIR 3","4 × 6/6 · RIR 3",""], wk:O, log:"kg"},
+    {id:"renegado", n:"Remo renegado", rx:["3 × 6/6 · RIR 3","4 × 6/6 · RIR 3",""], wk:O, log:"kg"},
+    {id:"isotiron", n:"ISO push tirón medio muslo", rx:N('3 × 5"'), wk:S3},
+    {id:"isobancom", n:"ISO push banco plano", rx:N('3 × 5"'), wk:S3},
+    {id:"isomilitar", n:"ISO push press militar", rx:N('3 × 5"'), wk:S3},
+    {id:"isogem", n:"ISO push gemelos", rx:N('3 × 5"'), wk:S3}]},
+  {b:"C2", ex:[
+    {id:"dominada", n:"Dominada / semi-asistida", rx:["3 × máx","4 × máx",""], wk:O, log:"reps"},
+    {id:"sumo", n:"Peso muerto sumo", rx:["3 × 6-8 · RIR 2","4 × 6-8 · RIR 2",""], wk:O, log:"kg"},
+    {id:"arranque1b", n:"Arranque 1B", tag:"elegí 1", rx:N("3 × 4/4 · RPE 7-8"), wk:S3, log:"kg"},
+    {id:"arranqueparado", n:"Arranque parado", tag:"elegí 1", rx:N("3 × 3 · RPE 7-8"), wk:S3, log:"kg"}]},
+  {b:"C3", ex:[
+    {id:"sliders", n:"Curl de isquio c/sliders 2P", rx:["3 × 6","4 × 6",""], wk:O},
+    {id:"aperturas", n:"Aperturas en inclinado", rx:["3 × 8 · RIR 3","4 × 8 · RIR 3",""], wk:O, log:"kg"},
+    {id:"tirones", n:"Tirones", tag:"elegí 1", rx:N("3 × 3 · RPE 7-8"), wk:S3, log:"kg"},
+    {id:"cargadaparado", n:"Cargada parado", tag:"elegí 1", rx:N("3 × 3 · RPE 7-8"), wk:S3, log:"kg"}]},
   {b:"C4", ex:[
-    {id:"rotpared", n:"Rotacional a pared", rx:N("3 × 4/4"), log:"kg"},
-    {id:"vuelos", n:"Vuelos", rx:["15-12-10","15-12-10","3 × 4/4"], log:"kg"}]},
+    {id:"rotpared", n:"Rotacional a pared", rx:N("3 × 4/4"), wk:S3, log:"kg"},
+    {id:"biceps", n:"Bíceps", rx:["15-12-10","15-12-10",""], wk:O, log:"kg"},
+    {id:"vuelos", n:"Vuelos", rx:["15-12-10","15-12-10","3 × 4/4"], log:"kg"},
+    {id:"triceps", n:"Tríceps", rx:["15-12-10","15-12-10",""], wk:O, log:"kg"}]},
   {b:"SNPS", ex:[
-    {id:"snpsgluteo", n:"Postura glúteo", rx:N("3 minutos")}]},
+    {id:"snpsgluteo", n:"Postura glúteo", rx:N("3 minutos"), wk:S3}]},
  ]},
  {k:"jue", t:"Jue", blocks:[
-  {b:"Activación", sub:"No citadas", ex:[
+  {b:"Activación", ex:[
     {id:"isobanco", n:"ISO push banco plano", rx:['3 × 3"','3 × 4"','3 × 5"']},
     {id:"lanzmb", n:"Lanzamiento horizontal c/MB", rx:"3 × 5", log:"kg"},
     {id:"isocatch", n:"ISO catch elevación cadera 1P", rx:["3 × 2/2","3 × 3/3","3 × 3/3"]}]},
   {b:"C1", ex:[
-    {id:"bancobarra", n:"Banco plano c/barra", rx:N("3 × 4"), pct:[null,null,80], rm:"banco", log:"kg"},
-    {id:"despegue", n:"Despegue c/barra hex", rx:N("3 × 4"), pct:[null,null,80], rm:"despegue", log:"kg"}]},
+    {id:"bancobarra", n:"Banco plano c/barra", rx:["3 × 5","3 × 3","3 × 4"], pct:PCT, rm:"banco", log:"kg"},
+    {id:"despegue", n:"Despegue c/barra hex", rx:["3 × 5","3 × 3","3 × 4"], pct:PCT, rm:"despegue", log:"kg"},
+    {id:"remobarra", n:"Remo c/barra", tag:"planilla vieja", rx:["3 × 5","3 × 3",""], pct:[70,75,null], rm:"remo", wk:X, log:"kg"},
+    {id:"cadera", n:"Elevación de cadera", tag:"planilla vieja", rx:["3 × 5","3 × 3",""], pct:[70,75,null], rm:"cadera", wk:X, log:"kg"}]},
   {b:"C2", ex:[
     {id:"multidir", n:"Salto multidireccional", rx:"3 × 1 pasada"},
     {id:"prisioneros", n:"Prisioneros", rx:"3 × 4"},
@@ -295,6 +322,7 @@ const DAYS = [
   {b:"C4", sub:"Orden fijo", ex:[
     {id:"vfrontales", n:"Vuelos frontales", rx:["3 × 8 · RIR 2","3 × 10 · RIR 2","3 × 12 · RIR 2"], log:"kg"},
     {id:"bancomanc", n:"Banco plano c/mancuernas", rx:["3 × 8 · RIR 2","3 × 10 · RIR 2","3 × 12 · RIR 2"], log:"kg"},
+    {id:"fondos", n:"Fondos", tag:"Bahiense del Norte", rx:["3 × 8 · RIR 2","3 × 10 · RIR 2",""], wk:X, log:"kg"},
     {id:"tricpolea", n:"Tríceps polea", rx:["3 × 8 · RIR 2","3 × 10 · RIR 2","3 × 12 · RIR 2"], log:"kg"},
     {id:"remopolea", n:"Remo polea", rx:["3 × 8 · RIR 2","3 × 10 · RIR 2","3 × 12 · RIR 2"], log:"kg"}]},
  ]},
@@ -342,10 +370,10 @@ const Wn = (v,n) => Array.from({length:n},(_,i) => Array.isArray(v) ? (v[i] ?? n
 function norm(days,n=3){
   return days.map(d=>({k:d.k, t:d.t, blocks:d.blocks.map(b=>({b:b.b, sub:b.sub||"", ex:b.ex.map(e=>({
     id:e.id, n:e.n, tag:e.tag||"", rx:Wn(e.rx,n).map(x=>x||""), pct:Wn(e.pct,n),
-    rm:e.rm||"", pc:e.pc ?? null, log:e.log||""
+    rm:e.rm||"", pc:Wn(e.pc,n), wk:Wn(e.wk ?? true,n).map(x=>x===null?true:!!x), log:e.log||""
   }))}))}));
 }
-const RUT_VER = 2; // versión de la Rutina #1 que vino del club
+const RUT_VER = 3; // versión de la Rutina #1 que vino del club
 const rutina1Def = () => ({id:"b1", name:"Rutina #1", weeks:3, v:RUT_VER, days:norm(DAYS,3)});
 
 /* rutinas guardadas: {active, list:[{id,name,weeks,days,lastWeek}]} y RM compartidos */
@@ -362,7 +390,44 @@ if(!store){
   ls.set("ub-rutinas", store); ls.set("ub-rms", rmsList);
 }
 if(!rmsList){ rmsList = clone(DEF_RMS); ls.set("ub-rms", rmsList); }
-DEF_RMS.forEach(d=>{ if(!rmsList.some(x=>x.k===d.k)){ rmsList.push(clone(d)); } });
+DEF_RMS.forEach(d=>{ const r=rmsList.find(x=>x.k===d.k); if(!r) rmsList.push(clone(d)); else if(r.def==null && d.def!=null) r.def=d.def; });
+ls.set("ub-rms", rmsList);
+(function upgradeR1(){
+  const r1=store.list.find(r=>r.id==="b1");
+  if(!r1 || (r1.v||0)>=RUT_VER) return;
+  const fresh=norm(DAYS,3);
+  const known=new Set(); fresh.forEach(d=>d.blocks.forEach(b=>b.ex.forEach(e=>known.add(d.k+"|"+e.id))));
+  (r1.days||[]).forEach(od=>{
+    let nd=fresh.find(d=>d.k===od.k);
+    if(!nd){ fresh.push(norm([od],3)[0]); return; }        // día que agregaste vos
+    const extra=[]; od.blocks.forEach(b=>b.ex.forEach(e=>{ if(!known.has(od.k+"|"+e.id)) extra.push(e); }));
+    if(extra.length) nd.blocks.push({b:"Agregados por vos", sub:"", ex:norm([{k:"x",t:"",blocks:[{b:"",ex:extra}]}],3)[0].blocks[0].ex});
+  });
+  r1.days=fresh; r1.weeks=3; r1.v=RUT_VER;
+  ls.set("ub-rutinas", store);
+})();
+
+/* plan compensatorio de resistencia (VIFT 16,5 km/h) */
+const COMP_DAYS = [
+ {k:"rsa", t:"RSA", blocks:[
+  {b:"RSA", sub:"Día 1 · 20 m al 115% VIFT", ex:[
+    {id:"rsa20", n:"Pasadas de 20 m", tag:"tope 3,79\" c/u", rx:['4 bloques × 4 · pausa 30" · entre bloques 2\'30"','4 bloques × 4 · pausa 30" · entre bloques 2\'','4 bloques × 4 · pausa 30" · entre bloques 1\'30"','4 bloques × 4 · pausa 30" · entre bloques 1\''], log:"seg"}]},
+ ]},
+ {k:"intm", t:"Intermitente", blocks:[
+  {b:"Intermitente", sub:"Día 2 · 28 m ida y vuelta", ex:[
+    {id:"int15", n:"15\" de trabajo", tag:"objetivo 55 m (80%)", rx:['4 bloques × 4 · 15"/30" · entre bloques 2\'','4 bloques × 4 · 15"/20" · entre bloques 1\'30"','4 bloques × 4 · 15"/15" · entre bloques 1\'','4 bloques × 4 · 15"/10" · entre bloques 30"']}]},
+ ]},
+ {k:"ivl", t:"Intervalado", blocks:[
+  {b:"Intervalado", sub:"Día 3 · 4 bloques", ex:[
+    {id:"ivl", n:"Bloques de carrera", rx:['4 × 1\'30" · pausa 1\'30" · 412 m (~14,5 canchas)','4 × 2\' · pausa 1\' · 550 m (~19,5 canchas)','4 × 2\'30" · pausa 1\' · 688 m (~24,5 canchas)','4 × 3\' · pausa 1\' · 825 m (~29,5 canchas)']}]},
+ ]},
+];
+(function seedComp(){
+  const seeded = ls.get("ub-seeded", []);
+  if(seeded.includes("comp1")) return;
+  if(!store.list.some(r=>r.id==="comp1")) store.list.push({id:"comp1", name:"Compensatorio resistencia", weeks:4, days:norm(COMP_DAYS,4)});
+  seeded.push("comp1"); ls.set("ub-seeded", seeded); ls.set("ub-rutinas", store);
+})();
 const getRut = id => store.list.find(r=>r.id===id);
 let rutina = getRut(store.active) || store.list[0];
 let docs = ls.get("ub-docs", {});
@@ -389,6 +454,9 @@ function rmOf(k){
   const r=rmsList.find(r=>r.k===k); return r ? (r.def ?? null) : null;
 }
 function pcOf(){ return (docs.ajustes||{}).pc ?? null; }
+const pcAt = (e,w) => Array.isArray(e.pc) ? (e.pc[w-1] ?? null) : (e.pc ?? null);
+const inWeek = (e,w) => !Array.isArray(e.wk) || e.wk[w-1]!==false;
+const visibleEx = (e,w,dk=day) => inWeek(e,w) || docs[sid(w,dk)]?.v?.[e.id]!=null;
 function refFor(e){
   for(let w=week-1; w>=1; w--){ const v=docs[sid(w,day)]?.v?.[e.id]; if(v!=null) return {label:`Semana ${w}`, v}; }
   // si no hay dato en esta rutina, busca el mismo ejercicio en las rutinas anteriores
@@ -414,12 +482,21 @@ function switchRut(id){
 function setWeeks(n){
   n=Math.min(8,Math.max(1,n|0)); if(n===rutina.weeks) return;
   rutina.weeks=n;
-  rutina.days.forEach(d=>d.blocks.forEach(b=>b.ex.forEach(e=>{ e.rx=Wn(e.rx,n).map(x=>x||""); e.pct=Wn(e.pct,n); })));
+  rutina.days.forEach(d=>d.blocks.forEach(b=>b.ex.forEach(e=>{ e.rx=Wn(e.rx,n).map(x=>x||""); e.pct=Wn(e.pct,n); e.pc=Wn(e.pc,n); e.wk=Wn(e.wk ?? true,n).map(x=>x===null?true:!!x); })));
   week=Math.min(week,n);
 }
 
 /* ---------- plan preventivo (kine) ---------- */
 const YT = id => "https://www.youtube.com/shorts/" + id;
+const POSTURAS = {b:"Posturas de relajación", sub:"Al final del día · suave, progresiva y sostenida", ex:[
+  {n:"Isquiotibiales", d:"2-3 min", nota:"Sacro en contacto con el suelo, busco alto con los talones. Rodillas en semiflexión si siento mucha tensión.", v:""},
+  {n:"Aductores – inserción distal", d:"2-3 min", nota:"Si hay demasiada tensión, limito la amplitud con almohadones a los costados.", v:""},
+  {n:"Aductores – inserción proximal", d:"2-3 min", nota:"2 variantes. Apertura progresiva sin forzar, pelvis neutra, dejo que el músculo ceda. En la 2ª variante, almohadones debajo de las rodillas si hay mucha tensión.", v:""},
+  {n:"Piramidal – glúteos", d:"2-3 min", nota:"3 variantes.", v:""},
+  {n:"Cuádriceps", d:"2-3 min", nota:"Me sostengo para que el músculo se relaje. Pelvis neutra con leve empuje hacia adelante.", v:""},
+  {n:"Psoas", d:"2-3 min", nota:"Rodilla de adelante flexionada hasta quedar alineada con el tobillo. La camilla puede ser una mesa y la pelota una silla.", v:""},
+  {n:"Sóleo", d:"2-3 min", nota:"Relajo la pierna de atrás con rodillas en semiflexión. Llevo el peso hacia atrás sin despegar los talones.", v:""},
+  {n:"Gemelos", d:"2-3 min", nota:"Rodilla de atrás en extensión. Llevo el peso hacia adelante sin despegar los talones.", v:""}]};
 const KINE_DEF = {
   freq: "4 días por semana × 1 serie de toda la rutina, o 2 días por semana × 2 series.",
   blocks: [
@@ -433,13 +510,18 @@ const KINE_DEF = {
       {n:"Puntas de pie, bajo explosivo a dos piernas", d:"x10", nota:"", v:YT("K8o8ngdHvsc")},
       {n:"Puntas de pie, bajo explosivo a una pierna", d:"x6 c/l", nota:"", v:YT("rPZInSx_AcQ")},
       {n:"Frenada anterior", d:"x8 c/l", nota:"Amortiguo flexionando cadera y rodilla de forma controlada. Sostengo la posición de frenado 2 segundos.", v:YT("qbC31LyXCNI")}]},
-    {b:"Relajación", sub:"Posturas de elongación", ex:[
-      {n:"Isquiotibiales", d:"", nota:"", v:""},
-      {n:"Aductores", d:"", nota:"Inserción distal y proximal.", v:""},
-      {n:"Gemelo y sóleo", d:"", nota:"", v:""}]},
+    POSTURAS,
   ]
 };
-let kine = ls.get("ub-kine", null) || clone(KINE_DEF);
+KINE_DEF.v = 2;
+let kine = ls.get("ub-kine", null) || {...clone(KINE_DEF), v:2};
+if((kine.v||0) < 2){
+  // reemplaza el bloque de relajación original por las posturas de la kine, sin tocar tus otros cambios
+  const nk = s => String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+  const i = kine.blocks.findIndex(b => nk(b.b).startsWith("relajacion") && b.ex.length===3 && nk(b.ex[0].n)==="isquiotibiales");
+  if(i>=0) kine.blocks[i]=clone(POSTURAS); else kine.blocks.push(clone(POSTURAS));
+  kine.v=2; ls.set("ub-kine", kine);
+}
 let view = ls.get("ub-vista", "gym") === "kine" ? "kine" : "gym";
 function saveKine(){ if(ls.set("ub-kine",kine)) setStatus("ok","Plan guardado"); else setStatus("warn","No se pudo guardar el plan"); }
 const safeUrl = u => /^https?:\/\//i.test(String(u||"").trim()) ? String(u).trim() : "";
@@ -548,7 +630,7 @@ function renderNav(){
   document.getElementById("days").hidden = !gym || creating;
   document.getElementById("weeks").innerHTML=range(rutina.weeks).map(i=>i+1).map(w=>{
     const l=weekLabel(w);
-    return `<button type="button" data-w="${w}" aria-pressed="${w===week}">Semana ${w}${l?`<small>${esc(l)}</small>`:""}</button>`;
+    return `<button type="button" data-w="${w}" aria-pressed="${w===week}">${rutina.weeks>3?"Sem "+w:"Semana "+w}${l?`<small>${esc(l)}</small>`:""}</button>`;
   }).join("");
   document.getElementById("days").innerHTML=rutina.days.map(d=>
     `<button type="button" data-d="${esc(d.k)}" aria-pressed="${d.k===day}">${esc(d.t)}</button>`).join("")
@@ -568,7 +650,9 @@ function renderAjustes(){
 function renderView(d){
   const cur = docs[sid(week,day)]?.v || {};
   if(!d.blocks.length) return `<p class="empty">Este día no tiene ejercicios. Tocá <b>Editar</b> para cargarlos.</p>`;
-  return d.blocks.map(b=>`
+  const bl = d.blocks.map(b=>({...b, ex:b.ex.filter(e=>visibleEx(e,week))})).filter(b=>b.ex.length);
+  if(!bl.length) return `<p class="empty">Este día no tiene ejercicios en la semana ${week}.</p>`;
+  return bl.map(b=>`
     <section class="block">
       <div class="bhead"><h3>${esc(b.b)}</h3>${b.sub?`<span>${esc(b.sub)}</span>`:""}</div>
       ${b.ex.map(e=>{
@@ -581,11 +665,12 @@ function renderView(d){
             ? `<span class="chip rm">${fmt(p)}% RM → <b>${Math.round(rm*p/100)} kg</b></span>`
             : `<button type="button" class="chip miss" data-open="1">${fmt(p)}% RM · cargá tu RM</button>`;
         }
-        if(e.pc!=null){
+        const epc=pcAt(e,week);
+        if(epc!=null){
           const pc=pcOf();
           chips += pc!=null
-            ? `<span class="chip pc">${fmt(e.pc)}% PC → <b>${Math.round(pc*e.pc/100)} kg</b></span>`
-            : `<button type="button" class="chip miss" data-open="1">${fmt(e.pc)}% PC · cargá tu peso</button>`;
+            ? `<span class="chip pc">${fmt(epc)}% PC → <b>${Math.round(pc*epc/100)} kg</b></span>`
+            : `<button type="button" class="chip miss" data-open="1">${fmt(epc)}% PC · cargá tu peso</button>`;
         }
         let right = `<div class="none">—</div>`, ref="";
         if(e.log){
@@ -632,14 +717,15 @@ function renderEdit(d){
         <label for="ed-n${id}">Ejercicio<input class="in name" id="ed-n${id}" ${A} data-f="n" value="${esc(e.n)}" autocomplete="off"></label>
         <div class="edgrid" style="--cols:${Math.min(rutina.weeks,3)}">
           ${range(rutina.weeks).map(i=>`<label for="ed-rx${id}-${i}">${rutina.weeks>1?`Series × reps S${i+1}`:"Series × reps"}<input class="in" id="ed-rx${id}-${i}" ${A} data-f="rx${i}" value="${esc(e.rx[i])}" placeholder="3 × 10" autocomplete="off"></label>`).join("")}
+          ${range(rutina.weeks).map(i=>`<label for="ed-c${id}-${i}">${rutina.weeks>1?`% PC S${i+1}`:"% peso corporal"}<input class="in" id="ed-c${id}-${i}" ${A} data-f="pc${i}" inputmode="decimal" value="${pcAt(e,i+1)!=null?fmt(pcAt(e,i+1)):""}" placeholder="—" autocomplete="off"></label>`).join("")}
           ${range(rutina.weeks).map(i=>`<label for="ed-p${id}-${i}">${rutina.weeks>1?`% RM S${i+1}`:"% RM"}<input class="in" id="ed-p${id}-${i}" ${A} data-f="pct${i}" inputmode="decimal" value="${e.pct[i]!=null?fmt(e.pct[i]):""}" placeholder="—" autocomplete="off"></label>`).join("")}
         </div>
         <div class="edrow">
           <label for="ed-rm${id}">% calculado sobre<select class="in" id="ed-rm${id}" ${A} data-f="rm">${rmOpts(e.rm)}</select></label>
-          <label for="ed-pc${id}">% peso corporal<input class="in" id="ed-pc${id}" ${A} data-f="pc" inputmode="decimal" value="${e.pc!=null?fmt(e.pc):""}" placeholder="—" autocomplete="off"></label>
           <label for="ed-log${id}">Qué registro<select class="in" id="ed-log${id}" ${A} data-f="log">${logOpts(e.log)}</select></label>
           <label for="ed-tag${id}">Etiqueta<input class="in" id="ed-tag${id}" ${A} data-f="tag" value="${esc(e.tag)}" placeholder="opcional" autocomplete="off"></label>
         </div>
+        ${rutina.weeks>1?`<fieldset class="wkset"><legend>Se hace en</legend>${range(rutina.weeks).map(i=>`<label class="wkchk" for="ed-w${id}-${i}"><input type="checkbox" id="ed-w${id}-${i}" ${A} data-f="wk${i}" ${inWeek(e,i+1)?"checked":""}> S${i+1}</label>`).join("")}</fieldset>`:""}
         <div class="tools">
           <button type="button" class="tb" data-act="eup" ${A} ${ei===0?"disabled":""} aria-label="Subir ejercicio">↑</button>
           <button type="button" class="tb" data-act="edown" ${A} ${ei===b.ex.length-1?"disabled":""} aria-label="Bajar ejercicio">↓</button>
@@ -695,7 +781,7 @@ function act(btn){
     case "eup": swap(b.ex,ei,ei-1); break;
     case "edown": swap(b.ex,ei,ei+1); break;
     case "edel": if(!confirm(`¿Borrar "${b.ex[ei].n}"?`)) return; b.ex.splice(ei,1); break;
-    case "eadd": b.ex.push({id:uid("e"), n:"Nuevo ejercicio", tag:"", rx:Wn("",rutina.weeks).map(()=>""), pct:Wn(null,rutina.weeks), rm:"", pc:null, log:"kg"}); saveRutina(); renderMain(); focusLater(`ed-n${bi}-${b.ex.length-1}`); return;
+    case "eadd": b.ex.push({id:uid("e"), n:"Nuevo ejercicio", tag:"", rx:Wn("",rutina.weeks).map(()=>""), pct:Wn(null,rutina.weeks), rm:"", pc:Wn(null,rutina.weeks), wk:Wn(true,rutina.weeks), log:"kg"}); saveRutina(); renderMain(); focusLater(`ed-n${bi}-${b.ex.length-1}`); return;
     case "dadd": { const k=uid("d"); rutina.days.push({k, t:"Día nuevo", blocks:[]}); day=k; saveRutina(); renderNav(); renderMain(); focusLater("ed-day"); return; }
     case "ddel": if(rutina.days.length<2 || !confirm(`¿Borrar el día "${d.t}" entero?`)) return; rutina.days=rutina.days.filter(x=>x!==d); fixDay(); saveRutina(); renderNav(); renderMain(); return;
     case "reset": if(!confirm("¿Volver a la Rutina #1 original del club? Se pierden los cambios que le hiciste (tus pesos registrados no se borran).")) return; Object.assign(rutina, {weeks:3, v:RUT_VER, days:norm(DAYS,3)}); fixDay(); saveRutina(); renderAll(); return;
@@ -745,10 +831,15 @@ function editField(t){
   if(f==="n"){ e.n=t.value.trim()||"Ejercicio"; }
   else if(f==="tag"){ e.tag=t.value.trim(); }
   else if(f.startsWith("rx")){ e.rx[+f.slice(2)]=t.value.trim(); }
-  else if(f.startsWith("pct")||f==="pc"){
+  else if(f.startsWith("wk")){
+    e.wk = Wn(e.wk ?? true, rutina.weeks).map(x=>x===null?true:!!x);
+    e.wk[+f.slice(2)] = t.checked;
+  }
+  else if(f.startsWith("pct")||/^pc\d+$/.test(f)){
     const n=parse(t.value); if(n===undefined){ t.value=""; }
     const v = n===undefined ? null : n;
-    if(f==="pc") e.pc=v; else e.pct[+f.slice(3)]=v;
+    if(f.startsWith("pct")) e.pct[+f.slice(3)]=v;
+    else { e.pc = Array.isArray(e.pc) ? Wn(e.pc,rutina.weeks) : Wn(e.pc ?? null, rutina.weeks); e.pc[+f.slice(2)]=v; }
     t.value = v!=null ? fmt(v) : "";
   }
   else if(f==="rm"){ e.rm=t.value; }
