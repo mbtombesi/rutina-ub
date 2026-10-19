@@ -137,6 +137,21 @@ body.editing header{border-bottom-color:var(--hot)}
 .knote{font-size:13px;color:var(--muted);margin-top:3px}
 .kvid{font:700 13px var(--body);text-decoration:none;padding:9px 12px;border-radius:6px;background:var(--hot);color:var(--card);white-space:nowrap}
 a.tb{text-decoration:none;display:inline-flex;align-items:center}
+.rutbar{display:flex;gap:6px;margin-top:8px;align-items:center}
+.rutbar select{flex:1;min-width:0;font:800 15px var(--body);padding:7px 9px}
+.rutbar .tb{flex:none;white-space:nowrap}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.edgrid{grid-template-columns:repeat(var(--cols,3),minmax(0,1fr))}
+.edrut{display:grid;grid-template-columns:minmax(0,1fr) 80px;gap:8px;align-items:end;margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px}
+.edrut .tb{grid-column:1/-1;justify-self:end}
+.edrut label,.newrut label{display:flex;flex-direction:column;gap:3px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;min-width:0}
+.newrut{margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px;display:grid;gap:12px}
+.newrut h2{font:900 24px var(--display);text-transform:uppercase;margin:0}
+.newrut .tip{margin:0;font-size:13px;color:var(--muted)}
+.newrut fieldset{border:0;padding:0;margin:0;display:grid;gap:6px}
+.newrut legend{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.newrut label.radio{flex-direction:row;align-items:center;gap:8px;font-size:15px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--ink)}
+.newrut .btns{display:flex;gap:8px;flex-wrap:wrap}
 @media (max-width:520px){h1{font-size:24px}.eyebrow{font-size:10px}header{padding-block:10px 6px}.weeks{margin-top:8px}.views{margin-top:8px}.views button{font-size:13px;padding:6px 0}.weeks button{font-size:16px;padding:4px 0}.weeks button small{font-size:9px}.days button{padding:6px 9px;font-size:12px}.rmbtn{padding:7px 10px;font-size:12px}}
 @media (max-width:380px){.ex{grid-template-columns:minmax(0,1fr) 92px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -156,6 +171,11 @@ a.tb{text-decoration:none;display:inline-flex;align-items:center}
       </div>
     </div>
     <div class="views" id="views" role="tablist" aria-label="Sección"></div>
+    <div class="rutbar" id="rutbar">
+      <label class="sr" for="rutsel">Rutina</label>
+      <select class="in" id="rutsel"></select>
+      <button type="button" class="tb" data-act="rnew">+ Nueva</button>
+    </div>
     <div class="weeks" id="weeks"></div>
     <nav class="days" id="days"></nav>
   </header>
@@ -171,7 +191,7 @@ a.tb{text-decoration:none;display:inline-flex;align-items:center}
     </div>
     <div class="backup">
       <h4>Copia de seguridad</h4>
-      <p>Tus registros, tu rutina y el plan preventivo quedan guardados en este celu. Bajá una copia cada tanto, o para pasarlos a otro dispositivo.</p>
+      <p>Tus registros, tus rutinas y el plan preventivo quedan guardados en este celu. Bajá una copia cada tanto, o para pasarlos a otro dispositivo.</p>
       <div class="btns">
         <button type="button" class="btn2" id="exportar">Descargar copia</button>
         <button type="button" class="btn2" id="importar">Restaurar copia</button>
@@ -318,51 +338,85 @@ const ls = {
   set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}
 };
 const clone = o => JSON.parse(JSON.stringify(o));
-const W3 = (v) => [0,1,2].map(i => Array.isArray(v) ? (v[i] ?? null) : (v ?? null));
-function norm(days){
+const Wn = (v,n) => Array.from({length:n},(_,i) => Array.isArray(v) ? (v[i] ?? null) : (v ?? null));
+function norm(days,n=3){
   return days.map(d=>({k:d.k, t:d.t, blocks:d.blocks.map(b=>({b:b.b, sub:b.sub||"", ex:b.ex.map(e=>({
-    id:e.id, n:e.n, tag:e.tag||"", rx:W3(e.rx).map(x=>x||""), pct:W3(e.pct),
+    id:e.id, n:e.n, tag:e.tag||"", rx:Wn(e.rx,n).map(x=>x||""), pct:Wn(e.pct,n),
     rm:e.rm||"", pc:e.pc ?? null, log:e.log||""
   }))}))}));
 }
-const RUT_VER = 2; // subir cuando el club manda una planificación nueva
-const defaultRutina = () => ({v:RUT_VER, rms:clone(DEF_RMS), days:norm(DAYS)});
-let rutina = ls.get("ub-rutina", null);
+const RUT_VER = 2; // versión de la Rutina #1 que vino del club
+const rutina1Def = () => ({id:"b1", name:"Rutina #1", weeks:3, v:RUT_VER, days:norm(DAYS,3)});
+
+/* rutinas guardadas: {active, list:[{id,name,weeks,days,lastWeek}]} y RM compartidos */
+let store = ls.get("ub-rutinas", null);
+let rmsList = ls.get("ub-rms", null);
 let rutinaNueva = false;
-if(!rutina || rutina.v !== RUT_VER){
-  const extra = (rutina?.rms||[]).filter(r=>!DEF_RMS.some(d=>d.k===r.k));
-  rutinaNueva = !!rutina;
-  rutina = defaultRutina(); rutina.rms.push(...extra);
-  ls.set("ub-rutina", rutina);
+if(!store){
+  const old = ls.get("ub-rutina", null);
+  let r1;
+  if(old && old.v===RUT_VER){ r1 = {id:"b1", name:"Rutina #1", weeks:3, v:RUT_VER, days:old.days}; }
+  else { r1 = rutina1Def(); rutinaNueva = !!old; }
+  if(!rmsList){ rmsList = clone(DEF_RMS); (old?.rms||[]).forEach(r=>{ if(!rmsList.some(x=>x.k===r.k)) rmsList.push(r); }); }
+  store = {active:"b1", list:[r1]};
+  ls.set("ub-rutinas", store); ls.set("ub-rms", rmsList);
 }
+if(!rmsList){ rmsList = clone(DEF_RMS); ls.set("ub-rms", rmsList); }
+DEF_RMS.forEach(d=>{ if(!rmsList.some(x=>x.k===d.k)){ rmsList.push(clone(d)); } });
+const getRut = id => store.list.find(r=>r.id===id);
+let rutina = getRut(store.active) || store.list[0];
 let docs = ls.get("ub-docs", {});
-let editing = false;
-const BLOCK_ID = "b1";
+let editing = false, creating = false;
 const wd = new Date().getDay();
-let week = ls.get("ub-semana", 1);
-if(rutinaNueva || ls.get("ub-rut-ver",0)!==RUT_VER){ week = 3; ls.set("ub-semana",3); ls.set("ub-rut-ver",RUT_VER); }
+let week = rutina.lastWeek || ls.get("ub-semana", 1);
+if(rutina.id==="b1" && (rutinaNueva || ls.get("ub-rut-ver",0)!==RUT_VER)){ week = 3; ls.set("ub-rut-ver",RUT_VER); }
+week = Math.min(Math.max(1,week), rutina.weeks);
+rutina.lastWeek = week;
 let day = ({1:"lun",2:"mar",3:"mie",4:"jue"})[wd] || ls.get("ub-dia", null) || "g1";
 function fixDay(){ if(!rutina.days.some(d=>d.k===day)) day = rutina.days[0]?.k; }
 fixDay();
 const curDay = () => rutina.days.find(d=>d.k===day) || rutina.days[0];
-const sid = (w,d) => `${BLOCK_ID}-w${w}-${d}`;
+const sid = (w,d,rid=rutina.id) => `${rid}-w${w}-${d}`;
 const fmt = n => (Math.round(n*100)/100).toString().replace(".",",");
 const parse = s => { s=String(s).trim().replace(",","."); if(!s) return null; const n=parseFloat(s); return isNaN(n)?undefined:n; };
 const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+const range = n => Array.from({length:n},(_,i)=>i);
+const nkey = s => String(s||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g," ").trim();
 function rmOf(k){
   if(!k) return null;
   const s=(docs.ajustes||{}).rm||{};
   if(k in s) return s[k];
-  const r=rutina.rms.find(r=>r.k===k); return r ? (r.def ?? null) : null;
+  const r=rmsList.find(r=>r.k===k); return r ? (r.def ?? null) : null;
 }
 function pcOf(){ return (docs.ajustes||{}).pc ?? null; }
-function refFor(exId){
-  for(let w=week-1; w>=1; w--){ const v=docs[sid(w,day)]?.v?.[exId]; if(v!=null) return {w,v}; }
+function refFor(e){
+  for(let w=week-1; w>=1; w--){ const v=docs[sid(w,day)]?.v?.[e.id]; if(v!=null) return {label:`Semana ${w}`, v}; }
+  // si no hay dato en esta rutina, busca el mismo ejercicio en las rutinas anteriores
+  const name=nkey(e.n), idx=store.list.indexOf(rutina);
+  for(let i=idx-1; i>=0; i--){
+    const r=store.list[i];
+    for(let w=r.weeks; w>=1; w--) for(const d of r.days) for(const b of d.blocks) for(const x of b.ex){
+      if(nkey(x.n)!==name) continue;
+      const v=docs[sid(w,d.k,r.id)]?.v?.[x.id];
+      if(v!=null) return {label:`${r.name} · S${w}`, v};
+    }
+  }
   return null;
 }
 function saveDocs(){ if(ls.set("ub-docs",docs)) setStatus("ok","Guardado en este dispositivo"); else setStatus("warn","No se pudo guardar"); }
-function saveRutina(){ if(ls.set("ub-rutina",rutina)) setStatus("ok","Rutina guardada"); else setStatus("warn","No se pudo guardar la rutina"); }
-
+function saveRutina(){ if(ls.set("ub-rutinas",store)) setStatus("ok","Rutina guardada"); else setStatus("warn","No se pudo guardar la rutina"); }
+function saveRms(){ ls.set("ub-rms",rmsList); }
+function switchRut(id){
+  const r=getRut(id); if(!r) return;
+  rutina.lastWeek=week; rutina=r; store.active=id; saveRutina();
+  week=Math.min(r.lastWeek||1, r.weeks); fixDay();
+}
+function setWeeks(n){
+  n=Math.min(8,Math.max(1,n|0)); if(n===rutina.weeks) return;
+  rutina.weeks=n;
+  rutina.days.forEach(d=>d.blocks.forEach(b=>b.ex.forEach(e=>{ e.rx=Wn(e.rx,n).map(x=>x||""); e.pct=Wn(e.pct,n); })));
+  week=Math.min(week,n);
+}
 
 /* ---------- plan preventivo (kine) ---------- */
 const YT = id => "https://www.youtube.com/shorts/" + id;
@@ -393,8 +447,6 @@ const safeUrl = u => /^https?:\/\//i.test(String(u||"").trim()) ? String(u).trim
 function renderViews(){
   document.getElementById("views").innerHTML = [["gym","Gym"],["kine","Preventivo"]].map(([k,t])=>
     `<button type="button" role="tab" data-v="${k}" aria-selected="${view===k}">${t}</button>`).join("");
-  document.getElementById("weeks").hidden = view!=="gym";
-  document.getElementById("days").hidden = view!=="gym";
 }
 function renderKineView(){
   let n=0;
@@ -489,7 +541,12 @@ function weekLabel(w){
 function renderNav(){
   renderViews();
   document.getElementById("h1").textContent = view==="kine" ? "Plan preventivo" : "Rutina de fuerza";
-  document.getElementById("weeks").innerHTML=[1,2,3].map(w=>{
+  const gym = view==="gym";
+  document.getElementById("rutbar").hidden = !gym;
+  document.getElementById("rutsel").innerHTML = store.list.slice().reverse().map(r=>`<option value="${esc(r.id)}" ${r===rutina?"selected":""}>${esc(r.name)}</option>`).join("");
+  document.getElementById("weeks").hidden = !gym || rutina.weeks<2 || creating;
+  document.getElementById("days").hidden = !gym || creating;
+  document.getElementById("weeks").innerHTML=range(rutina.weeks).map(i=>i+1).map(w=>{
     const l=weekLabel(w);
     return `<button type="button" data-w="${w}" aria-pressed="${w===week}">Semana ${w}${l?`<small>${esc(l)}</small>`:""}</button>`;
   }).join("");
@@ -499,11 +556,11 @@ function renderNav(){
   document.getElementById("edbtn").setAttribute("aria-pressed",editing);
   document.getElementById("edbtn").textContent = editing ? "Listo" : "Editar";
   document.body.classList.toggle("editing",editing);
-  document.getElementById("foot").hidden = editing || view==="kine";
+  document.getElementById("foot").hidden = editing || creating || view==="kine";
 }
 function renderAjustes(){
   const pc = pcOf();
-  document.getElementById("rmgrid").innerHTML = rutina.rms.map(r=>{
+  document.getElementById("rmgrid").innerHTML = rmsList.map(r=>{
     const v=rmOf(r.k), custom=!DEF_RMS.some(d=>d.k===r.k);
     return `<div class="rmcell"><label for="rm-${esc(r.k)}">${esc(r.n)}<span class="field ${v!=null?'filled':''}"><input id="rm-${esc(r.k)}" data-rm="${esc(r.k)}" inputmode="decimal" autocomplete="off" value="${v!=null?fmt(v):''}" placeholder="—"><span>kg</span></span></label>${custom?`<button type="button" class="tb del" data-act="rmdel" data-k="${esc(r.k)}" aria-label="Borrar ${esc(r.n)}">✕</button>`:""}</div>`;
   }).join("") + `<div class="rmcell"><label for="pc-in">Peso corporal<span class="field ${pc!=null?'filled':''}"><input id="pc-in" data-pc="1" inputmode="decimal" autocomplete="off" value="${pc!=null?fmt(pc):''}" placeholder="—"><span>kg</span></span></label></div>`;
@@ -534,8 +591,8 @@ function renderView(d){
         if(e.log){
           const v=cur[e.id];
           right = `<label class="field ${v!=null?'filled':''}" for="in-${esc(e.id)}"><input id="in-${esc(e.id)}" data-ex="${esc(e.id)}" inputmode="decimal" autocomplete="off" value="${v!=null?fmt(v):''}" placeholder="—" aria-label="${esc(e.n)} (${UNIT[e.log]})"><span>${UNIT[e.log]}</span></label>`;
-          const r=refFor(e.id);
-          ref = week===1 ? "" : `<div class="ref">${r?`Semana ${r.w}: <b>${fmt(r.v)} ${UNIT[e.log]}</b>`:"Semana anterior: sin dato"}</div>`;
+          const r=refFor(e);
+          ref = r ? `<div class="ref">${esc(r.label)}: <b>${fmt(r.v)} ${UNIT[e.log]}</b></div>` : (week===1 ? "" : `<div class="ref">Semana anterior: sin dato</div>`);
         }
         return `<div class="ex"><div style="min-width:0">
             <div class="name">${esc(e.n)}${e.tag?`<em>${esc(e.tag)}</em>`:""}</div>
@@ -545,11 +602,16 @@ function renderView(d){
     </section>`).join("");
 }
 function renderEdit(d){
-  const rmOpts = sel => `<option value="">Ninguno</option>` + rutina.rms.map(r=>`<option value="${esc(r.k)}" ${r.k===sel?"selected":""}>${esc(r.n)}</option>`).join("");
+  const rmOpts = sel => `<option value="">Ninguno</option>` + rmsList.map(r=>`<option value="${esc(r.k)}" ${r.k===sel?"selected":""}>${esc(r.n)}</option>`).join("");
   const logOpts = sel => [["kg","Peso (kg)"],["reps","Repeticiones"],["seg","Segundos"],["","No registrar"]].map(([v,t])=>`<option value="${v}" ${v===sel?"selected":""}>${t}</option>`).join("");
   const n = d.blocks.length;
   return `
   <div class="edhint">Modo edición. Los cambios se guardan solos. Tocá <b>Listo</b> arriba cuando termines.</div>
+  <div class="edrut">
+    <label for="ed-rname">Nombre de la rutina<input class="in" id="ed-rname" data-f="rname" value="${esc(rutina.name)}" autocomplete="off"></label>
+    <label for="ed-rweeks">Semanas<input class="in" id="ed-rweeks" data-f="rweeks" type="number" min="1" max="8" inputmode="numeric" value="${rutina.weeks}"></label>
+    <button type="button" class="tb del" data-act="rdel" ${store.list.length<2?"disabled":""}>Borrar rutina</button>
+  </div>
   <div class="edday">
     <label for="ed-day">Nombre del día<input class="in" id="ed-day" data-f="dayname" value="${esc(d.t)}" autocomplete="off"></label>
     <button type="button" class="tb del" data-act="ddel" ${rutina.days.length<2?"disabled":""}>Borrar día</button>
@@ -568,9 +630,9 @@ function renderEdit(d){
       ${b.ex.map((e,ei)=>{ const id=`${bi}-${ei}`, A=`data-b="${bi}" data-e="${ei}"`; return `
       <div class="edex">
         <label for="ed-n${id}">Ejercicio<input class="in name" id="ed-n${id}" ${A} data-f="n" value="${esc(e.n)}" autocomplete="off"></label>
-        <div class="edgrid">
-          ${[0,1,2].map(i=>`<label for="ed-rx${id}-${i}">Series × reps S${i+1}<input class="in" id="ed-rx${id}-${i}" ${A} data-f="rx${i}" value="${esc(e.rx[i])}" placeholder="3 × 10" autocomplete="off"></label>`).join("")}
-          ${[0,1,2].map(i=>`<label for="ed-p${id}-${i}">% RM S${i+1}<input class="in" id="ed-p${id}-${i}" ${A} data-f="pct${i}" inputmode="decimal" value="${e.pct[i]!=null?fmt(e.pct[i]):""}" placeholder="—" autocomplete="off"></label>`).join("")}
+        <div class="edgrid" style="--cols:${Math.min(rutina.weeks,3)}">
+          ${range(rutina.weeks).map(i=>`<label for="ed-rx${id}-${i}">${rutina.weeks>1?`Series × reps S${i+1}`:"Series × reps"}<input class="in" id="ed-rx${id}-${i}" ${A} data-f="rx${i}" value="${esc(e.rx[i])}" placeholder="3 × 10" autocomplete="off"></label>`).join("")}
+          ${range(rutina.weeks).map(i=>`<label for="ed-p${id}-${i}">${rutina.weeks>1?`% RM S${i+1}`:"% RM"}<input class="in" id="ed-p${id}-${i}" ${A} data-f="pct${i}" inputmode="decimal" value="${e.pct[i]!=null?fmt(e.pct[i]):""}" placeholder="—" autocomplete="off"></label>`).join("")}
         </div>
         <div class="edrow">
           <label for="ed-rm${id}">% calculado sobre<select class="in" id="ed-rm${id}" ${A} data-f="rm">${rmOpts(e.rm)}</select></label>
@@ -587,13 +649,34 @@ function renderEdit(d){
       <button type="button" class="add" data-act="eadd" data-b="${bi}">+ Agregar ejercicio</button>
     </section>`).join("")}
   <button type="button" class="add big" data-act="badd">+ Agregar bloque</button>
-  <div class="edfoot">
-    <button type="button" class="tb del" data-act="reset">Volver a la rutina original del club</button>
-  </div>`;
+  ${rutina.id==="b1"?`<div class="edfoot">
+    <button type="button" class="tb del" data-act="reset">Volver a la Rutina #1 original del club</button>
+  </div>`:""}`;
+}
+function renderNew(){
+  const nxt = "Rutina #" + (store.list.filter(r=>/^Rutina #\d+$/.test(r.name)).length + 1);
+  return `
+  <section class="newrut">
+    <h2>Nueva rutina</h2>
+    <label for="nr-name">Nombre<input class="in" id="nr-name" value="${esc(nxt)}" autocomplete="off"></label>
+    <label for="nr-weeks">Semanas<input class="in" id="nr-weeks" type="number" min="1" max="8" inputmode="numeric" value="3"></label>
+    <p class="tip">Para un día suelto, como un trabajo diferenciado después de partido, poné <b>1 semana</b> y un nombre con la fecha.</p>
+    <fieldset>
+      <legend>Arrancar</legend>
+      <label class="radio"><input type="radio" name="nr-from" value="blank" checked> En blanco</label>
+      <label class="radio"><input type="radio" name="nr-from" value="copy"> Copiando los ejercicios de ${esc(rutina.name)}</label>
+    </fieldset>
+    <div class="btns">
+      <button type="button" class="rmbtn" data-act="rcreate">Crear y cargar ejercicios</button>
+      <button type="button" class="btn2" data-act="rcancel">Cancelar</button>
+    </div>
+  </section>`;
 }
 function renderMain(){
   const d=curDay();
-  document.getElementById("main").innerHTML = view==="kine" ? (editing ? renderKineEdit() : renderKineView()) : (d ? (editing ? renderEdit(d) : renderView(d)) : "");
+  document.getElementById("main").innerHTML = view==="kine" ? (editing ? renderKineEdit() : renderKineView())
+    : creating ? renderNew()
+    : (d ? (editing ? renderEdit(d) : renderView(d)) : `<p class="empty">Esta rutina no tiene días. Tocá <b>Editar</b> para cargarlos.</p>`);
 }
 function renderAll(){ renderNav(); renderMain(); renderAjustes(); }
 function setStatus(cls,txt){const s=document.getElementById("status");s.className="status "+cls;s.querySelector("span").textContent=txt;}
@@ -612,23 +695,38 @@ function act(btn){
     case "eup": swap(b.ex,ei,ei-1); break;
     case "edown": swap(b.ex,ei,ei+1); break;
     case "edel": if(!confirm(`¿Borrar "${b.ex[ei].n}"?`)) return; b.ex.splice(ei,1); break;
-    case "eadd": b.ex.push({id:uid("e"), n:"Nuevo ejercicio", tag:"", rx:["","",""], pct:[null,null,null], rm:"", pc:null, log:"kg"}); saveRutina(); renderMain(); focusLater(`ed-n${bi}-${b.ex.length-1}`); return;
+    case "eadd": b.ex.push({id:uid("e"), n:"Nuevo ejercicio", tag:"", rx:Wn("",rutina.weeks).map(()=>""), pct:Wn(null,rutina.weeks), rm:"", pc:null, log:"kg"}); saveRutina(); renderMain(); focusLater(`ed-n${bi}-${b.ex.length-1}`); return;
     case "dadd": { const k=uid("d"); rutina.days.push({k, t:"Día nuevo", blocks:[]}); day=k; saveRutina(); renderNav(); renderMain(); focusLater("ed-day"); return; }
     case "ddel": if(rutina.days.length<2 || !confirm(`¿Borrar el día "${d.t}" entero?`)) return; rutina.days=rutina.days.filter(x=>x!==d); fixDay(); saveRutina(); renderNav(); renderMain(); return;
-    case "reset": if(!confirm("¿Volver a la rutina original del club? Se pierden los cambios que hiciste a la rutina (tus pesos registrados no se borran).")) return; rutina=defaultRutina(); fixDay(); saveRutina(); renderAll(); return;
+    case "reset": if(!confirm("¿Volver a la Rutina #1 original del club? Se pierden los cambios que le hiciste (tus pesos registrados no se borran).")) return; Object.assign(rutina, {weeks:3, v:RUT_VER, days:norm(DAYS,3)}); fixDay(); saveRutina(); renderAll(); return;
+    case "rnew": creating=true; editing=false; renderNav(); renderMain(); window.scrollTo({top:0}); focusLater("nr-name"); return;
+    case "rcancel": creating=false; renderNav(); renderMain(); return;
+    case "rcreate": {
+      const name=document.getElementById("nr-name").value.trim()||"Rutina nueva";
+      const weeks=Math.min(8,Math.max(1,parseInt(document.getElementById("nr-weeks").value,10)||1));
+      const copy=document.querySelector('input[name="nr-from"]:checked')?.value==="copy";
+      const days = copy ? norm(clone(rutina.days),weeks) : [{k:"d1", t:"Día 1", blocks:[]}];
+      const r={id:uid("r"), name, weeks, days};
+      store.list.push(r); switchRut(r.id); week=1; fixDay();
+      creating=false; editing=true; saveRutina(); renderAll(); window.scrollTo({top:0}); return;
+    }
+    case "rdel": {
+      if(store.list.length<2 || !confirm(`¿Borrar "${rutina.name}"? Se borran sus días y ejercicios. Los pesos que registraste quedan guardados en la copia de seguridad.`)) return;
+      store.list=store.list.filter(r=>r!==rutina); switchRut(store.list[store.list.length-1].id); editing=false; renderAll(); return;
+    }
     case "rmadd": {
       const n=document.getElementById("newrm-n").value.trim(); const v=parse(document.getElementById("newrm-v").value);
       if(!n){ document.getElementById("newrm-n").focus(); return; }
-      const k=uid("rm"); rutina.rms.push({k, n, def:null}); saveRutina();
+      const k=uid("rm"); rmsList.push({k, n, def:null}); saveRms();
       if(v!=null){ docs.ajustes={rm:{...((docs.ajustes||{}).rm||{}), [k]:v}, pc:(docs.ajustes||{}).pc ?? null}; saveDocs(); }
       document.getElementById("newrm-n").value=""; document.getElementById("newrm-v").value="";
       renderAjustes(); renderMain(); return;
     }
     case "rmdel": {
-      const k=btn.dataset.k, r=rutina.rms.find(x=>x.k===k);
+      const k=btn.dataset.k, r=rmsList.find(x=>x.k===k);
       if(!r || !confirm(`¿Borrar el RM "${r.n}"? Los ejercicios que lo usaban quedan sin cálculo de %.`)) return;
-      rutina.rms=rutina.rms.filter(x=>x.k!==k);
-      rutina.days.forEach(dd=>dd.blocks.forEach(bb=>bb.ex.forEach(e=>{ if(e.rm===k) e.rm=""; })));
+      rmsList=rmsList.filter(x=>x.k!==k); saveRms();
+      store.list.forEach(rr=>rr.days.forEach(dd=>dd.blocks.forEach(bb=>bb.ex.forEach(e=>{ if(e.rm===k) e.rm=""; }))));
       saveRutina(); renderAjustes(); renderMain(); return;
     }
     default: return;
@@ -637,6 +735,8 @@ function act(btn){
 }
 function editField(t){
   const f=t.dataset.f, d=curDay(); if(!d) return;
+  if(f==="rname"){ rutina.name=t.value.trim()||"Rutina"; saveRutina(); renderNav(); return; }
+  if(f==="rweeks"){ const n=parseInt(t.value,10); if(!n){ t.value=rutina.weeks; return; } setWeeks(n); t.value=rutina.weeks; saveRutina(); renderNav(); renderMain(); return; }
   if(f==="dayname"){ d.t=t.value.trim()||"Día"; saveRutina(); renderNav(); return; }
   const b=d.blocks[+t.dataset.b]; if(!b) return;
   if(f==="b"){ b.b=t.value.trim()||"Bloque"; saveRutina(); return; }
@@ -663,9 +763,9 @@ document.addEventListener("click",ev=>{
   if(a){ if(a.dataset.act.startsWith("k")) kineAct(a); else act(a); return; }
   const v=ev.target.closest("[data-v]");
   if(v){ view=v.dataset.v; ls.set("ub-vista",view); renderNav(); renderMain(); window.scrollTo({top:0}); return; }
-  if(w){week=+w.dataset.w; ls.set("ub-semana",week); renderNav(); renderMain();}
+  if(w){week=+w.dataset.w; rutina.lastWeek=week; ls.set("ub-rutinas",store); renderNav(); renderMain();}
   if(d){day=d.dataset.d; ls.set("ub-dia",day); renderNav(); renderMain(); window.scrollTo({top:0});}
-  if(ev.target.id==="edbtn"){ editing=!editing; document.getElementById("ajustes").hidden=true; document.getElementById("rmbtn").setAttribute("aria-expanded",false); renderNav(); renderMain(); window.scrollTo({top:0}); }
+  if(ev.target.id==="edbtn"){ editing=!editing; creating=false; document.getElementById("ajustes").hidden=true; document.getElementById("rmbtn").setAttribute("aria-expanded",false); renderNav(); renderMain(); window.scrollTo({top:0}); }
   if(o||ev.target.id==="rmbtn"){
     const p=document.getElementById("ajustes"), b=document.getElementById("rmbtn");
     const open = o ? true : p.hidden;
@@ -676,9 +776,10 @@ document.addEventListener("click",ev=>{
 document.addEventListener("keydown",ev=>{ if(ev.key==="Enter" && ev.target.tagName==="INPUT") ev.target.blur(); });
 document.addEventListener("change",ev=>{
   const t=ev.target;
+  if(t.id==="rutsel"){ switchRut(t.value); editing=false; creating=false; renderAll(); window.scrollTo({top:0}); return; }
   if(t.dataset.kf){ kineField(t); return; }
   if(t.dataset.f){ editField(t); return; }
-  if(t.id==="newrm-n"||t.id==="newrm-v"||t.id==="archivo") return;
+  if(t.id==="newrm-n"||t.id==="newrm-v"||t.id==="archivo"||t.id==="nr-name"||t.id==="nr-weeks"||t.name==="nr-from") return;
   const n=parse(t.value);
   if(n===undefined){ t.value=""; return; }
   if(t.dataset.ex){
@@ -698,7 +799,7 @@ document.addEventListener("focusout",()=>setTimeout(()=>{ if(!editing && documen
 
 /* ---------- copia de seguridad ---------- */
 document.getElementById("exportar").addEventListener("click",()=>{
-  const blob=new Blob([JSON.stringify({app:"rutina-ub",fecha:new Date().toISOString(),docs,rutina,kine},null,1)],{type:"application/json"});
+  const blob=new Blob([JSON.stringify({app:"rutina-ub",ver:2,fecha:new Date().toISOString(),docs,rutinas:store,rms:rmsList,kine},null,1)],{type:"application/json"});
   const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
   a.download="rutina-ub-"+new Date().toISOString().slice(0,10)+".json";
   document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
@@ -710,7 +811,10 @@ document.getElementById("archivo").addEventListener("change",ev=>{
   f.text().then(t=>{
     const j=JSON.parse(t); if(!j||j.app!=="rutina-ub"||typeof j.docs!=="object") throw 0;
     docs=j.docs; ls.set("ub-docs",docs);
-    if(j.rutina && Array.isArray(j.rutina.days)){ rutina=j.rutina; ls.set("ub-rutina",rutina); fixDay(); }
+    if(j.rutinas && Array.isArray(j.rutinas.list) && j.rutinas.list.length){ store=j.rutinas; }
+    else if(j.rutina && Array.isArray(j.rutina.days)){ store={active:"b1", list:[{id:"b1", name:"Rutina #1", weeks:3, v:RUT_VER, days:j.rutina.days}]}; if(j.rutina.rms) j.rms=j.rutina.rms; }
+    if(Array.isArray(j.rms)){ rmsList=j.rms; DEF_RMS.forEach(d=>{ if(!rmsList.some(x=>x.k===d.k)) rmsList.push(clone(d)); }); saveRms(); }
+    ls.set("ub-rutinas",store); rutina=getRut(store.active)||store.list[0]; week=Math.min(week,rutina.weeks); fixDay();
     if(j.kine && Array.isArray(j.kine.blocks)){ kine=j.kine; ls.set("ub-kine",kine); }
     renderAll();
     document.getElementById("bkmsg").textContent="Copia restaurada.";
