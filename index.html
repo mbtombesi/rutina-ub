@@ -477,6 +477,45 @@ const DIF_DAYS = [
   ls.set("ub-rutinas", store);
   ls.set("ub-fix-1910", true);
 })();
+
+/* semana del 19/10: lunes (ayer) y martes (hoy) */
+const SEM1910_DAYS = [
+ {k:"lun", t:"Lun 19/10", blocks:[
+  {b:"C1", sub:"Sentadilla + secuencia de saltos (en cada serie)", ex:[
+    {id:"sentadilla", n:"Sentadilla", tag:"Belu: RIR 3", rx:"3 × 5 · RIR 3", log:"kg"},
+    {id:"saltoscarga", n:"Saltos con carga", rx:"+ 3 saltos", pc:30, log:"kg"},
+    {id:"dropjump", n:"Drop jump", rx:"+ 3"},
+    {id:"vallas", n:"Saltos entre vallas", rx:"+ 3"},
+    {id:"saltoasist", n:"Saltos asistidos", rx:'+ 10"'}]},
+  {b:"C1", sub:"Banco plano + lanzamientos", ex:[
+    {id:"bancobarra", n:"Banco plano c/barra", rx:"3 × 5", pct:75, rm:"banco", log:"kg"},
+    {id:"lanzhoriz", n:"Lanzamiento horizontal", rx:"+ 5", log:"kg"}]},
+  {b:"C2", ex:[
+    {id:"remo3", n:"Remo 3 apoyos", rx:"8-8-6 · RIR 2-3", log:"kg"},
+    {id:"vuelosL", n:"Vuelos en L", rx:"3 × 10 · RIR 2-3", log:"kg"},
+    {id:"twist", n:"Twist", rx:"3 × 10 c/l", log:"kg"}]},
+ ]},
+ {k:"mar", t:"Mar 20/10", blocks:[
+  {b:"C1", ex:[
+    {id:"despegue", n:"Despegue c/barra hex", rx:"3 × 5", pct:75, rm:"despegue", log:"kg"},
+    {id:"pressmil", n:"Press militar", rx:"3 × 5", pct:75, rm:"press", log:"kg"}]},
+  {b:"C2", ex:[
+    {id:"trx1brazo", n:"TRX a un brazo", rx:"3 × 6 · RIR 1-2"},
+    {id:"burro", n:"Patada de burro c/mancuerna", rx:"3 × 8 · RIR 2-3", log:"kg"}]},
+  {b:"C3", ex:[
+    {id:"bicepsw", n:"Bíceps c/barra W", rx:"3 × 10 · RIR 1-2", log:"kg"},
+    {id:"vposteriores", n:"Vuelos posteriores", rx:"3 × 10 · RIR 1-2", log:"kg"}]},
+ ]},
+];
+(function seedSem1910(){
+  const seeded = ls.get("ub-seeded", []);
+  if(seeded.includes("sem1910")) return;
+  if(!store.list.some(r=>r.id==="sem1910")){
+    store.list.push({id:"sem1910", name:"Semana del 19/10", weeks:1, days:norm(SEM1910_DAYS,1)});
+    store.active="sem1910";
+  }
+  seeded.push("sem1910"); ls.set("ub-seeded", seeded); ls.set("ub-rutinas", store);
+})();
 const getRut = id => store.list.find(r=>r.id===id);
 let rutina = getRut(store.active) || store.list[0];
 let docs = ls.get("ub-docs", {});
