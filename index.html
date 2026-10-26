@@ -516,6 +516,41 @@ const SEM1910_DAYS = [
   }
   seeded.push("sem1910"); ls.set("ub-seeded", seeded); ls.set("ub-rutinas", store);
 })();
+const SEM2610_DAY = {k:"lun2610", t:"Lun 26/10", blocks:[
+ {b:"C1", ex:[
+   {id:"tironhex", n:"Tirón de arranque c/barra hex", rx:"3 × 4", log:"kg"},
+   {id:"rotpared", n:"Lanzamiento c/rotación a la pared", rx:"3 × 2 c/l", log:"kg"},
+   {id:"dropjump1p", n:"Drop jump 1P", rx:"3 × 2 c/l"}]},
+ {b:"C2", ex:[
+   {id:"cadera", n:"Elevación de cadera", tag:"Belu: 3 × 3", rx:"3 × 3 · grupo 3 × 1 al 85%", pct:85, rm:"cadera", log:"kg"},
+   {id:"saltoshoriz", n:"Saltos horizontales", rx:"+ 3"},
+   {id:"pressmil", n:"Press militar", tag:"Belu: 3 × 3", rx:"3 × 3 · grupo 3 × 1 al 85%", pct:85, rm:"press", log:"kg"}]},
+ {b:"C3", ex:[
+   {id:"trx1brazo", n:"Remo en TRX a un brazo", rx:"3 × 6 · RIR 2-3"},
+   {id:"subcajon", n:"Subidas al cajón", tag:"Belu (grupo: pistol al banco)", rx:"3 × 4 · RIR 2", log:"kg"},
+   {id:"vallas1p", n:"Saltos a 1 pierna entre vallas", rx:"+ 3"}]},
+ {b:"C4", ex:[
+   {id:"gemelos", n:"Gemelos c/barra", rx:"3 × 8 · RIR 1-2", log:"kg"},
+   {id:"vfrontales", n:"Vuelos frontales alternados", rx:"3 × 10 · RIR 1-2", log:"kg"},
+   {id:"remopolea", n:"Remo en polea", rx:"15-12-10 · RIR 1-2", log:"kg"}]},
+]};
+let seedDay = null;
+const nkey0 = s => String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g," ").trim();
+(function seedSem2610(){
+  const seeded = ls.get("ub-seeded", []);
+  if(seeded.includes("sem2610")) return;
+  let r = store.list.find(x=>{ const k=nkey0(x.name); return k.includes("26 10") && k.includes("semana"); });
+  if(!r){ r={id:"sem2610", name:"Semana 26/10", weeks:1, days:[]}; store.list.push(r); }
+  if(!r.days.some(d=>d.k===SEM2610_DAY.k)){
+    const docs0 = ls.get("ub-docs", {});
+    const hasLog = k => Object.keys(docs0).some(id=>id.startsWith(r.id+"-") && id.endsWith("-"+k) && Object.keys(docs0[id]?.v||{}).length);
+    // si solo tiene el "Día 1" vacío que crea la app (sin ejercicios ni registros), lo reemplazo
+    if(r.days.length===1 && !r.days[0].blocks.length && !hasLog(r.days[0].k)) r.days=[];
+    r.days.push(...norm([SEM2610_DAY], r.weeks||1));
+  }
+  store.active=r.id; r.lastWeek=1; seedDay=SEM2610_DAY.k;
+  seeded.push("sem2610"); ls.set("ub-seeded", seeded); ls.set("ub-rutinas", store);
+})();
 const getRut = id => store.list.find(r=>r.id===id);
 let rutina = getRut(store.active) || store.list[0];
 let docs = ls.get("ub-docs", {});
@@ -526,6 +561,7 @@ if(rutina.id==="b1" && (rutinaNueva || ls.get("ub-rut-ver",0)!==RUT_VER)){ week 
 week = Math.min(Math.max(1,week), rutina.weeks);
 rutina.lastWeek = week;
 let day = ({1:"lun",2:"mar",3:"mie",4:"jue"})[wd] || ls.get("ub-dia", null) || "g1";
+if(seedDay) day = seedDay;
 function fixDay(){ if(!rutina.days.some(d=>d.k===day)) day = rutina.days[0]?.k; }
 fixDay();
 const curDay = () => rutina.days.find(d=>d.k===day) || rutina.days[0];
