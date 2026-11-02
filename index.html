@@ -551,6 +551,36 @@ const nkey0 = s => String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300
   store.active=r.id; r.lastWeek=1; seedDay=SEM2610_DAY.k;
   seeded.push("sem2610"); ls.set("ub-seeded", seeded); ls.set("ub-rutinas", store);
 })();
+const SEM0211_DAY = {k:"lun0211", t:"Lun 02/11", blocks:[
+ {b:"C1", ex:[
+   {id:"2tbarra", n:"Segundo tiempo c/barra", rx:"3 × 2 c/l", log:"kg"},
+   {id:"rotpared", n:"Lanzamiento c/rotación a la pared", rx:"3 × 2 c/l", log:"kg"},
+   {id:"saltoshoriz", n:"Saltos horizontales", rx:"3 × 5"}]},
+ {b:"C2", ex:[
+   {id:"sentadilla", n:"Sentadilla", rx:"3 × 5", pct:80, rm:"sentadilla", log:"kg"},
+   {id:"pressmil", n:"Press militar", rx:"3 × 5", pct:80, rm:"press", log:"kg"}]},
+ {b:"C3", ex:[
+   {id:"remo3", n:"Remo 3 apoyos", rx:"8-8-6 · RIR 1-2", log:"kg"},
+   {id:"nordico1p", n:"Caída nórdica a una pierna", rx:"3 × 3 c/l"}]},
+ {b:"C4", ex:[
+   {id:"vlaterales", n:"Vuelos laterales", rx:"12-12-10-10 · RIR 1-2", log:"kg"},
+   {id:"bicepsw", n:"Bíceps c/barra W", rx:"12-12-10-10 · RIR 1-2", log:"kg"},
+   {id:"tricpolea", n:"Tríceps en polea", rx:"12-12-10-10 · RIR 1-2", log:"kg"}]},
+]};
+(function seedSem0211(){
+  const seeded = ls.get("ub-seeded", []);
+  if(seeded.includes("sem0211")) return;
+  let r = store.list.find(x=>{ const k=nkey0(x.name); return k.includes("semana") && /(^| )0?2 11( |$)/.test(k); });
+  if(!r){ r={id:"sem0211", name:"Semana 02/11", weeks:1, days:[]}; store.list.push(r); }
+  if(!r.days.some(d=>d.k===SEM0211_DAY.k)){
+    const docs0 = ls.get("ub-docs", {});
+    const hasLog = k => Object.keys(docs0).some(id=>id.startsWith(r.id+"-") && id.endsWith("-"+k) && Object.keys(docs0[id]?.v||{}).length);
+    if(r.days.length===1 && !r.days[0].blocks.length && !hasLog(r.days[0].k)) r.days=[];
+    r.days.push(...norm([SEM0211_DAY], r.weeks||1));
+  }
+  store.active=r.id; r.lastWeek=1; seedDay=SEM0211_DAY.k;
+  seeded.push("sem0211"); ls.set("ub-seeded", seeded); ls.set("ub-rutinas", store);
+})();
 const getRut = id => store.list.find(r=>r.id===id);
 let rutina = getRut(store.active) || store.list[0];
 let docs = ls.get("ub-docs", {});
