@@ -581,6 +581,35 @@ const SEM0211_DAY = {k:"lun0211", t:"Lun 02/11", blocks:[
   store.active=r.id; r.lastWeek=1; seedDay=SEM0211_DAY.k;
   seeded.push("sem0211"); ls.set("ub-seeded", seeded); ls.set("ub-rutinas", store);
 })();
+const SEM0911_DAY = {k:"mie1111", t:"Mié 11/11", blocks:[
+ {b:"C1", ex:[
+   {id:"despegue", n:"Despegue c/barra hex", rx:"3 × 3", pct:85, rm:"despegue", log:"kg"},
+   {id:"despegue90", n:"Despegue · serie al 90%", tag:"máx reps (pasale cuántas)", rx:"1 × máx reps", pct:90, rm:"despegue", log:"reps"},
+   {id:"remobarra", n:"Remo c/barra", rx:"3 × 3", pct:85, rm:"remo", log:"kg"},
+   {id:"remobarra90", n:"Remo c/barra · serie al 90%", tag:"máx reps (pasale cuántas)", rx:"1 × máx reps", pct:90, rm:"remo", log:"reps"}]},
+ {b:"C2", ex:[
+   {id:"bancoincl", n:"Banco inclinado c/barra", rx:"3 × 6 · RIR 3", log:"kg"},
+   {id:"bulgaras", n:"Sentadilla búlgara", rx:"3 × 4 · RIR 2", log:"kg"}]},
+ {b:"C3", ex:[
+   {id:"bicepsw", n:"Bíceps c/barra W", rx:"12-12-10-10 · RIR 1", log:"kg"},
+   {id:"tricfrances", n:"Tríceps francés", rx:"12-12-10-10 · RIR 1", log:"kg"},
+   {id:"vlaterales", n:"Vuelos laterales", rx:"12-12-10-10 · RIR 1", log:"kg"},
+   {id:"aperturasplano", n:"Aperturas en banco plano", rx:"12-12-10-10 · RIR 1", log:"kg"}]},
+]};
+(function seedSem0911(){
+  const seeded = ls.get("ub-seeded", []);
+  if(seeded.includes("sem0911")) return;
+  let r = store.list.find(x=>{ const k=nkey0(x.name); return k.includes("semana") && /(^| )0?9 11( |$)/.test(k); });
+  if(!r){ r={id:"sem0911", name:"Semana 09/11", weeks:1, days:[]}; store.list.push(r); }
+  if(!r.days.some(d=>d.k===SEM0911_DAY.k)){
+    const docs0 = ls.get("ub-docs", {});
+    const hasLog = k => Object.keys(docs0).some(id=>id.startsWith(r.id+"-") && id.endsWith("-"+k) && Object.keys(docs0[id]?.v||{}).length);
+    if(r.days.length===1 && !r.days[0].blocks.length && !hasLog(r.days[0].k)) r.days=[];
+    r.days.push(...norm([SEM0911_DAY], r.weeks||1));
+  }
+  store.active=r.id; r.lastWeek=1; seedDay=SEM0911_DAY.k;
+  seeded.push("sem0911"); ls.set("ub-seeded", seeded); ls.set("ub-rutinas", store);
+})();
 const getRut = id => store.list.find(r=>r.id===id);
 let rutina = getRut(store.active) || store.list[0];
 let docs = ls.get("ub-docs", {});
