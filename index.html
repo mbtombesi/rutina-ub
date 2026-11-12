@@ -610,6 +610,19 @@ const SEM0911_DAY = {k:"mie1111", t:"Mié 11/11", blocks:[
   store.active=r.id; r.lastWeek=1; seedDay=SEM0911_DAY.k;
   seeded.push("sem0911"); ls.set("ub-seeded", seeded); ls.set("ub-rutinas", store);
 })();
+(function logs1111(){
+  const seeded = ls.get("ub-seeded", []);
+  if(seeded.includes("log1111")) return;
+  const r = store.list.find(x=>x.days.some(d=>d.k==="mie1111"));
+  if(r){
+    const d = ls.get("ub-docs", {}), k = `${r.id}-w1-mie1111`;
+    d[k] = d[k] || {v:{}}; d[k].v = d[k].v || {};
+    const vals = {bancoincl:35, bulgaras:22, bicepsw:5, tricfrances:15, vlaterales:6};
+    for(const id in vals) if(d[k].v[id]==null) d[k].v[id]=vals[id];
+    ls.set("ub-docs", d);
+  }
+  seeded.push("log1111"); ls.set("ub-seeded", seeded);
+})();
 const getRut = id => store.list.find(r=>r.id===id);
 let rutina = getRut(store.active) || store.list[0];
 let docs = ls.get("ub-docs", {});
