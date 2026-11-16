@@ -623,6 +623,58 @@ const SEM0911_DAY = {k:"mie1111", t:"Mié 11/11", blocks:[
   }
   seeded.push("log1111"); ls.set("ub-seeded", seeded);
 })();
+const SAB1411_DAY = {k:"sab1411", t:"Sáb 14/11", blocks:[
+ {b:"C1", ex:[
+   {id:"plancha2ap", n:"Plancha 2 apoyos", rx:'2 × 10" c/l'},
+   {id:"pallofL", n:"Pallof press en L", rx:"2 × 5 c/l", log:"kg"},
+   {id:"planchalat", n:"Plancha lateral", rx:'2 × 10" c/l'}]},
+ {b:"C2", ex:[
+   {id:"tiron", n:"Tirón medio muslo", rx:'3 × 3"'},
+   {id:"saltocajon", n:"Saltos al cajón", rx:"+ 3"},
+   {id:"remobanco", n:"Remo en banco", rx:"3 × 6", pct:60, rm:"remo", log:"kg"},
+   {id:"lanzvert", n:"Lanzamientos verticales", rx:"+ 5", log:"kg"}]},
+ {b:"C3", ex:[
+   {id:"pushup", n:"Push up", rx:"3 × 4"},
+   {id:"caderaiso", n:"Elevación de cadera isométrica", rx:"3 × 20 · sin carga"}]},
+]};
+(function seedSab1411(){
+  const seeded = ls.get("ub-seeded", []);
+  if(seeded.includes("sab1411")) return;
+  let r = store.list.find(x=>x.days.some(d=>d.k==="mie1111")) || store.list.find(x=>{ const k=nkey0(x.name); return k.includes("semana") && /(^| )0?9 11( |$)/.test(k); });
+  if(!r){ r={id:"sem0911", name:"Semana 09/11", weeks:1, days:[]}; store.list.push(r); }
+  if(!r.days.some(d=>d.k===SAB1411_DAY.k)) r.days.push(...norm([SAB1411_DAY], r.weeks||1));
+  store.active=r.id; r.lastWeek=1; seedDay=SAB1411_DAY.k;
+  seeded.push("sab1411"); ls.set("ub-seeded", seeded); ls.set("ub-rutinas", store);
+})();
+const LUN1611_DAY = {k:"lun1611", t:"Lun 16/11", blocks:[
+ {b:"C1", ex:[
+   {id:"2tbarra", n:"Segundo tiempo", rx:"3 × 2 c/l", log:"kg"},
+   {id:"lanzvert", n:"Lanzamientos verticales", rx:"3 × 6", log:"kg"}]},
+ {b:"C2", ex:[
+   {id:"cadera", n:"Elevación de cadera", rx:"3 × 5", pct:85, rm:"cadera", log:"kg"},
+   {id:"pressmil", n:"Press militar", rx:"3 × 5", pct:85, rm:"press", log:"kg"}]},
+ {b:"C3", ex:[
+   {id:"estocadalat", n:"Estocada lateral", rx:"3 × 6 c/l · RIR 3", log:"kg"},
+   {id:"domsupinas", n:"Dominadas supinas", rx:"3 × máx", log:"reps"}]},
+ {b:"C4", ex:[
+   {id:"vlaterales", n:"Vuelos laterales", rx:"15-15-12 · RIR 1-2", log:"kg"},
+   {id:"bicepsw", n:"Bíceps c/barra W", rx:"15-15-12 · RIR 1-2", log:"kg"},
+   {id:"tricpolea", n:"Tríceps en polea", rx:"15-15-12 · RIR 1-2", log:"kg"}]},
+]};
+(function seedSem1611(){
+  const seeded = ls.get("ub-seeded", []);
+  if(seeded.includes("sem1611")) return;
+  let r = store.list.find(x=>{ const k=nkey0(x.name); return k.includes("semana") && /(^| )16 11( |$)/.test(k); });
+  if(!r){ r={id:"sem1611", name:"Semana 16/11", weeks:1, days:[]}; store.list.push(r); }
+  if(!r.days.some(d=>d.k===LUN1611_DAY.k)){
+    const docs0 = ls.get("ub-docs", {});
+    const hasLog = k => Object.keys(docs0).some(id=>id.startsWith(r.id+"-") && id.endsWith("-"+k) && Object.keys(docs0[id]?.v||{}).length);
+    if(r.days.length===1 && !r.days[0].blocks.length && !hasLog(r.days[0].k)) r.days=[];
+    r.days.push(...norm([LUN1611_DAY], r.weeks||1));
+  }
+  store.active=r.id; r.lastWeek=1; seedDay=LUN1611_DAY.k;
+  seeded.push("sem1611"); ls.set("ub-seeded", seeded); ls.set("ub-rutinas", store);
+})();
 const getRut = id => store.list.find(r=>r.id===id);
 let rutina = getRut(store.active) || store.list[0];
 let docs = ls.get("ub-docs", {});
